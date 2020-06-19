@@ -9,15 +9,15 @@ update_console-bios-getter.sh
 
 These scripts look at what RBFconsole core files you have and downloads the bios needed for them.
 
-These scripts DO NOT download any cores.
+These scripts DO NOT download any cores. 
 
 Q:Will this script over write files I already have?
 
-A: NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files for.
+A: NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files BIOS files for the core.
 
 Q: Where are the Downloaded BIOS files located?
 
-A: This script downloads all bios files to /media/fat/BIOS. Symlinks are used in the consoles game directory back to the BIOS directory.
+A: This script downloads all bios files to /media/fat/BIOS. Symlinks are used in the consoles games directory to link back to the BIOS directory.
 
 
 You should back up your bios files before running this script.
