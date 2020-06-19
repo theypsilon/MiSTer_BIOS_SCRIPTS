@@ -3,7 +3,7 @@ Simple scripts to automate downloading BIOS files for MiSTer console cores based
 
 Instructions
 
-Download the update_console-bios-getter.sh to the Scripts directory and run.
+Download the update_console-bios-getter.sh to the Scripts directory and run:
 
 update_console-bios-getter.sh
 
