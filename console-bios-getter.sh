@@ -78,7 +78,7 @@ if [ `grep -c "COREPARTITION=" "${INIFILE_FIXED}"` -gt 0 ]
 fi 2>/dev/null 
 #####INFO TXT#####
 
-if [ `egrep -c "BIOSDIR|GAMESDIR" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "BIOSDIR|GAMESDIR|COREPARTITION" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
