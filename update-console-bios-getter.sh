@@ -45,6 +45,6 @@ chmod +x /tmp/console-bios-getter.sh
 
 /tmp/console-bios-getter.sh
 
-/tmp/console-bios-getter.sh
+rm /tmp/console-bios-getter.sh
 
 echo "FINISHED: CONSOLE-BIOS-GETTER"
