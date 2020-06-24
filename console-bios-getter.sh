@@ -23,10 +23,6 @@ CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show
 INIFILE="/media/fat/Scripts/update-console-bios-getter.ini"
 EXITSTATUS=0
 
-#More testing crap - this will be removed at release  
-#rm /media/fat/Scripts/update-console-bios-getter.sh 
-#########################
-#
 echo""
 
 #########Get Script - uncomment for release 
@@ -41,20 +37,6 @@ if [ ! -e "$g/update-console-bios-getter.sh" ]
 
 fi
 done
-
-#TESTING CRAP - THIS WILL BE REMOVED AT THE RELEASE 
-#rm -rf /media/fat/BIOS
-#unlink /media/fat/games/Astrocade/boot.rom
-#unlink /media/fat/games/Gameboy/boot1.rom
-#unlink /media/fat/games/MegaCD/boot.rom
-#unlink /media/fat/games/NeoGeo/000-lo.lo
-#unlink /media/fat/games/NeoGeo/sfix.sfix
-#unlink /media/fat/games/NeoGeo/uni-bios.rom
-#unlink /media/fat/games/TGFX16-CD/cd_bios.rom
-#unlink /media/fat/games/NES/boot0.rom 
-#END TESTING CRAP
-
-#####INI FILES VARS######
 
 INIFILE_FIXED=$(mktemp)
 if [[ -f "${INIFILE}" ]] ; then
