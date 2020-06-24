@@ -23,6 +23,10 @@ Q: Can I set a custom BIOS directory location.
 
 A: Yes, in the update_console-bios-getter.ini: BIOS_DIR=/path/to/your/location
 
+#Q: Can I set this to work with usb drives?
+
+#A: yes,in the update_console-bios-getter.ini: COREPARTITON=/media/usb0
+
 
 You should back up your bios files before running this script.
 
