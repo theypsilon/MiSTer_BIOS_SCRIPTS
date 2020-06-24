@@ -13,7 +13,6 @@ EXITSTATUS=0
 #########################
 #
 echo""
-echo "STARTING: console-bios-getter be patient." 
 
 #########Get Script - uncomment for release 
 find /media/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
@@ -270,7 +269,6 @@ if [ -e "$BIOSDIR/*.zip" ]
 	        rm "$BIOSDIR/*.zip"
 fi 
 
-echo "FINISHED: console-bios-getter"
 exit $EXITSTATUS
 
 #NEOGEO-BIOS 
