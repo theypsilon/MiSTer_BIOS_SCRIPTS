@@ -47,6 +47,9 @@
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
 
 ####################################################################################################
+export CURL_RETRY
+export ALLOW_INSECURE_SSL
+export SSL_SECURITY_OPTION
 
 echo "STARTING CONSOLE-BIOS-GETTER"
 echo ""
