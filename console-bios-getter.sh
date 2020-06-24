@@ -1,3 +1,6 @@
+#!/bin/bash
+#set -x
+
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
@@ -11,8 +14,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#!/bin/bash
-#set -x
+
 BIOSDIR="/media/fat/BIOS"
 GAMESDIR="/media/fat/games"
 COREPARTITION="/media/fat"
@@ -131,12 +133,11 @@ if [ -e "$PATHBOOTROM" ] || [ -e $GAMESDIR/TGFX16-CD/cd_bios.rom ]
                         	echo "Linking to:"
                        		if [ $SYSTEM != TurboGrafx16 ]
 					then
-                        			ln -sv "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/$SYSTEM/$BOOTROM"
+                        			cp -v "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/$SYSTEM/$BOOTROM"
                                                 [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors 
 					else 
 						
-                        			ln -sv "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/TGFX16-CD/$BOOTROM"	
-						#ln -sv '/media/fat/BIOS/TurboGrafx16/Super CD 3.0.pce' /media/fat/TGFX16-CD/cd_bios.rom
+                        			cp -v "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/TGFX16-CD/$BOOTROM"	
 						[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for TGFX16" >> /tmp/bios.errors 
 				fi
 
@@ -242,10 +243,10 @@ TurboGrafx16)
 				echo " "
 				unzip -o -j "$BIOSDIR/uni-bios-40.zip" -d "$BIOSDIR/$SYSTEM/"
 				echo "Linking to:"
-				ln -sv "$BIOSDIR/$SYSTEM/sfix.sfix" "$GAMESDIR/$SYSTEM/sfix.sfix"
+				cp -v "$BIOSDIR/$SYSTEM/sfix.sfix" "$GAMESDIR/$SYSTEM/sfix.sfix"
                                 [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
 				echo "Linking to:"
-				ln -sv "$BIOSDIR/$SYSTEM/uni-bios.rom" "$GAMESDIR/$SYSTEM/uni-bios.rom"
+				cp -v "$BIOSDIR/$SYSTEM/uni-bios.rom" "$GAMESDIR/$SYSTEM/uni-bios.rom"
 				[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
                                 echo " "
 				echo ""
