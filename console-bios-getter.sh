@@ -112,14 +112,14 @@ if [ -e "$PATHBOOTROM" ] || [ -e $GAMESDIR/TGFX16-CD/cd_bios.rom ]
                 	        echo ""
 				unzip -o -j "$BIOSDIR/$SYSTEM.zip" -d "$BIOSDIR/$SYSTEM/"
                         	echo ""
-                        	echo "Linking to:"
+                       
                        		if [ $SYSTEM != TurboGrafx16 ]
 					then
-                        			cp -v "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/$SYSTEM/$BOOTROM"
+                        			cp -vn "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/$SYSTEM/$BOOTROM"
                                                 [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors 
 					else 
 						
-                        			cp -v "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/TGFX16-CD/$BOOTROM"	
+                        			cp -vn "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/TGFX16-CD/$BOOTROM"	
 						[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for TGFX16" >> /tmp/bios.errors 
 				fi
 
@@ -224,11 +224,11 @@ TurboGrafx16)
 				curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR/uni-bios-40.zip" http://unibios.free.fr/download/uni-bios-40.zip 
 				echo " "
 				unzip -o -j "$BIOSDIR/uni-bios-40.zip" -d "$BIOSDIR/$SYSTEM/"
-				echo "Linking to:"
-				cp -v "$BIOSDIR/$SYSTEM/sfix.sfix" "$GAMESDIR/$SYSTEM/sfix.sfix"
+			
+				cp -vn "$BIOSDIR/$SYSTEM/sfix.sfix" "$GAMESDIR/$SYSTEM/sfix.sfix"
                                 [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
-				echo "Linking to:"
-				cp -v "$BIOSDIR/$SYSTEM/uni-bios.rom" "$GAMESDIR/$SYSTEM/uni-bios.rom"
+			
+				cp -vn "$BIOSDIR/$SYSTEM/uni-bios.rom" "$GAMESDIR/$SYSTEM/uni-bios.rom"
 				[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
                                 echo " "
 				echo ""
@@ -288,4 +288,3 @@ NEOGEO-BIOS:sp-s.sp1
 NEOGEO-BIOS:sp-u2.sp1
 NEOGEO-BIOS:uni-bios*rom
 NEOGEO-BIOS:vs-bios.rom
-
