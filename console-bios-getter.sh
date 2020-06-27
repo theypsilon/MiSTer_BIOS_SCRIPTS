@@ -18,23 +18,13 @@
 BIOSDIR="/media/fat/BIOS"
 GAMESDIR="/media/fat/games"
 BASE_PATH="/media/fat"
+OVERWRITE_GAMES_BIOS="false"
 SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
 INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
-
-echo""
-
-
-#rm -rf /media/fat/BIOS/
-#rm /media/fat/games/Astrocade/boot.rom
-#rm /media/fat/games/GAMEBOY/boot1.rom
-#rm /media/fat/games/MegaCD/boot.rom
-#rm /media/fat/games/NES/boot0.rom
-#rm /media/fat/games/NeoGeo/sfix.sfix
-#rm /media/fat/games/NeoGeo/000-lo.lo
-#rm /media/fat/games/NeoGeo/uni-bios.rom
-#rm /media/fat/games/TGFX16-CD/cd_bios.rom
+# Needs to be changed when a new zip has been uploaded with updated content
+RESOURCES_DATE="$(date -d '2020-06-14 16:35')"
 
 #########Get Script - uncomment for release 
 find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
@@ -67,10 +57,14 @@ fi 2>/dev/null
 if [ `grep -c "BASE_PATH=" "${INIFILE_FIXED}"` -gt 0 ]
    then
       BASE_PATH=`grep "BASE_PATH=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+fi 2>/dev/null
+if [ `grep -c "OVERWRITE_GAMES_BIOS=" "${INIFILE_FIXED}"` -gt 0 ]
+   then
+      OVERWRITE_GAMES_BIOS=`grep "OVERWRITE_GAMES_BIOS=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null 
 #####INFO TXT#####
 
-if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH|OVERWRITE_GAMES_BIOS" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
@@ -79,11 +73,6 @@ fi 2>/dev/null
 
 rm ${INIFILE_FIXED}
 
-#clean up errors file if it exist
-rm -v /tmp/bios.errors 2> /dev/null
-rm -v /tmp/dir.errors 2> /dev/null
-
-mkdir -p $BIOSDIR
 
 GETTER ()
 
@@ -119,10 +108,14 @@ GETTER_INTERNAL ()
 	local BIOSLINK="${4}"
 
 	PATHBOOTROM="$GAMESDIR/$SYSTEM_FOLDER/$BOOTROM"
+	if [[ "${OVERWRITE_GAMES_BIOS}" == "true" ]]
+		then
+			rm "${PATHBOOTROM}" 2> /dev/null
+	fi
 	if [ -e "$PATHBOOTROM" ]
 		then
 			echo "Nothing to be done."
-			echo "Skipped '$PATHBOOTROM' because already exists." >> /tmp/bios.errors 
+			echo "Skipped '$PATHBOOTROM' because already exists." >> /tmp/bios.info 
 		else
 
 			local ZIPPATH="$(basename ${ZIPURL})"
@@ -151,7 +144,6 @@ ITERATE_CONSOLES ()
 {
 	#FIND CONSOLES
 	find $BASE_PATH/_Console/ -maxdepth 5 -iname \*rbf  -path *_Console* > /tmp/bios-getter.file
-	echo ""
 	echo "Consoles Found:"
 	cat /tmp/bios-getter.file
 	echo "" 
@@ -210,13 +202,17 @@ ITERATE_CONSOLES ()
 				
 				if [[ "${SYSTEM_FOLDER}" != "" ]]
 					then
-
 						rm /tmp/neogeo.bios.file 2> /dev/null
 						grep "NEOGEO-BIOS:" "$0" | sed 's/NEOGEO-BIOS://' | while read z
 						do 
 							if [ -e "$GAMESDIR/${SYSTEM_FOLDER}/$z" ] 
-								then	
-									echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file   
+								then
+									if [[ "${OVERWRITE_GAMES_BIOS}" == "true" ]]
+										then
+											rm "$GAMESDIR/${SYSTEM_FOLDER}/$z" 2> /dev/null
+										else
+											echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file   
+									fi
 							fi
 						done
 
@@ -226,8 +222,8 @@ ITERATE_CONSOLES ()
 
 						if [ -e /tmp/neogeo.bios.file ] 
 							then
-								echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.errors
-								cat /tmp/neogeo.bios.file >> /tmp/bios.errors
+								echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.info
+								cat /tmp/neogeo.bios.file >> /tmp/bios.info
 							else
 								GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOTROM}" "${ZIPURL}" "${BIOSLINK}"
 
@@ -259,11 +255,34 @@ ITERATE_CONSOLES ()
 	done 
 }
 
+
+############### START ################
+
+#clean up errors file if it exist
+rm -v /tmp/bios.errors 2> /dev/null
+rm -v /tmp/bios.info 2> /dev/null
+rm -v /tmp/dir.errors 2> /dev/null
+
+if [ ! -f "${BIOSDIR}/date" ] || [[ "${RESOURCES_DATE}" > "$(cat ${BIOSDIR}/date)" ]]; then
+	rm -rf "${BIOSDIR}" 2> /dev/null
+	echo "BIOS folder is not yet installed or is not up-to-date."
+	echo
+fi
+
+mkdir -p "$BIOSDIR"
+
 ITERATE_CONSOLES
     
-if [ -e /tmp/bios.errors ]
+if [ -e /tmp/bios.info ]
 	then
  		echo "Please remove the existing BIOS files for the console and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
+      	cat /tmp/bios.info
+		rm /tmp/bios.info
+fi 
+
+if [ -e /tmp/bios.errors ]
+	then
+ 		echo "Following errors ocurred."
       	cat /tmp/bios.errors
 		rm /tmp/bios.errors
         EXITSTATUS=1 
@@ -282,7 +301,12 @@ fi
 if [ -e "$BIOSDIR/*.zip" ]
 	then
 	    rm "$BIOSDIR/*.zip"
-fi 
+fi
+
+if [[ "${EXITSTATUS}" == "0" ]] && [ ! -f "${BIOSDIR}/date" ]
+	then
+		echo "${RESOURCES_DATE}" > "${BIOSDIR}/date"
+fi
 
 exit $EXITSTATUS
 
