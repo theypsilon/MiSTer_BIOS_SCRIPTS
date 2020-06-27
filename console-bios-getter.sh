@@ -18,7 +18,7 @@
 BIOSDIR="/media/fat/BIOS"
 GAMESDIR="/media/fat/games"
 BASE_PATH="/media/fat"
-OVERWRITE_GAMES_BIOS="false"
+OVERWRITE_GAMES_BIOS="true"
 SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
 INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
@@ -108,10 +108,6 @@ GETTER_INTERNAL ()
 	local BIOSLINK="${4}"
 
 	PATHBOOTROM="$GAMESDIR/$SYSTEM_FOLDER/$BOOTROM"
-	if [[ "${OVERWRITE_GAMES_BIOS}" == "true" ]]
-		then
-			rm "${PATHBOOTROM}" 2> /dev/null
-	fi
 	if [ -e "$PATHBOOTROM" ]
 		then
 			echo "Nothing to be done."
@@ -207,12 +203,7 @@ ITERATE_CONSOLES ()
 						do 
 							if [ -e "$GAMESDIR/${SYSTEM_FOLDER}/$z" ] 
 								then
-									if [[ "${OVERWRITE_GAMES_BIOS}" == "true" ]]
-										then
-											rm "$GAMESDIR/${SYSTEM_FOLDER}/$z" 2> /dev/null
-										else
-											echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file   
-									fi
+									echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file   i
 							fi
 						done
 
