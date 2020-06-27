@@ -47,8 +47,16 @@
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
 
 ####################################################################################################
-export CURL_RETRY
-export ALLOW_INSECURE_SSL
+SSL_SECURITY_OPTION=""
+curl ${CURL_RETRY} "https://github.com" > /dev/null 2>&1
+case $? in
+    0) ;;
+    60) SSL_SECURITY_OPTION="--insecure" ;;
+    *)
+        echo "No Internet connection"
+        exit 1
+        ;;
+esac
 export SSL_SECURITY_OPTION
 
 echo "STARTING CONSOLE-BIOS-GETTER"
@@ -56,8 +64,8 @@ echo ""
 
 echo "Downloading the most recent console-bios-getter.sh script."
 echo " "
-wget -q -t 3 --output-file=/tmp/wget-log --show-progress -O /tmp/console-bios-getter.sh https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/console-bios-getter.sh
-
+CURL_RETRY="--connect-timeout 15 --max-time 60 --retry 3 --retry-delay 5 --show-error"
+curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o /tmp/console-bios-getter.sh https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/console-bios-getter.sh
 chmod +x /tmp/console-bios-getter.sh
 
 /tmp/console-bios-getter.sh

@@ -17,23 +17,33 @@
 
 BIOSDIR="/media/fat/BIOS"
 GAMESDIR="/media/fat/games"
-COREPARTITION="/media/fat"
-SSL_SECURITY_OPTION="--insecure"
+BASE_PATH="/media/fat"
+SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
-INIFILE="/media/fat/Scripts/update-console-bios-getter.ini"
+INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
 
 echo""
 
+
+#rm -rf /media/fat/BIOS/
+#rm /media/fat/games/Astrocade/boot.rom
+#rm /media/fat/games/GAMEBOY/boot1.rom
+#rm /media/fat/games/MegaCD/boot.rom
+#rm /media/fat/games/NES/boot0.rom
+#rm /media/fat/games/NeoGeo/sfix.sfix
+#rm /media/fat/games/NeoGeo/000-lo.lo
+#rm /media/fat/games/NeoGeo/uni-bios.rom
+#rm /media/fat/games/TGFX16-CD/cd_bios.rom
+
 #########Get Script - uncomment for release 
-find /media/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
+find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
 do 
-if [ ! -e "$g/update-console-bios-getter.sh" ]
+if [ ! -e "$g/update_console-bios-getter.sh" ]
 	then
-		echo ""
-		echo "Downloading update-console-bios-getter.sh to "$g""
-                echo ""
-		curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$g/update-console-bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update-console-bios-getter.sh
+		echo "Downloading update_console-bios-getter.sh to "$g""Q	Q
+        echo ""
+		curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$g/update_console-bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_console-bios-getter.sh
 
 fi
 done
@@ -54,13 +64,13 @@ if [ `grep -c "GAMESDIR=" "${INIFILE_FIXED}"` -gt 0 ]
       GAMESDIR=`grep "GAMESDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null 
 
-if [ `grep -c "COREPARTITION=" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `grep -c "BASE_PATH=" "${INIFILE_FIXED}"` -gt 0 ]
    then
-      COREPARTITION=`grep "COREPARTITION=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+      BASE_PATH=`grep "BASE_PATH=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null 
 #####INFO TXT#####
 
-if [ `egrep -c "BIOSDIR|GAMESDIR|COREPARTITION" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
@@ -75,179 +85,188 @@ rm -v /tmp/dir.errors 2> /dev/null
 
 mkdir -p $BIOSDIR
 
-echo ""
+GETTER ()
 
-#FIND CONSOLES
-find $COREPARTITION/_Console/ -maxdepth 5 -iname \*rbf  -path *_Console* > /tmp/bios-getter.file
-echo ""
-echo "Consoles Found:"
-cat /tmp/bios-getter.file
-echo "" 
-echo "Stating to look for needed bios files"
-sleep 5 
-cat /tmp/bios-getter.file| while read i 
-do 
+{
+	local SYSTEM="${1}"
+	local BOOTROM="${2}"
+	local ZIPURL="${3}"
+	local BIOSLINK="${4}"
 
-LINE=`basename "$i"`
-SYSTEM=`echo "${LINE::-13}"`
-#echo $SYSTEM
-
-GETTER () 
-
-{ echo ""
-echo "STARTING BIOS RETRVAL FOR: $SYSTEM" 
-echo ""
-
-PATHBOOTROM="$GAMESDIR/$SYSTEM/$BOOTROM"
-if [ -e "$PATHBOOTROM" ] || [ -e $GAMESDIR/TGFX16-CD/cd_bios.rom ]
-                        then
-                                echo "The $SYSTEM $BOOTROM already exists, please remove and rerun the script if you want them updated."
-				echo "$PATHBOOTROM"
-			       	echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors 
-                        else
-
-				mkdir -vp "$BIOSDIR/$SYSTEM"
-				echo ""
-				curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR"/"$SYSTEM".zip https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/"$SYSTEM".zip 
-                	        echo ""
-				unzip -o -j "$BIOSDIR/$SYSTEM.zip" -d "$BIOSDIR/$SYSTEM/"
-                        	echo ""
-                       
-                       		if [ $SYSTEM != TurboGrafx16 ]
-					then
-                        			cp -vn "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/$SYSTEM/$BOOTROM"
-                                                [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors 
-					else 
-						
-                        			cp -vn "$BIOSDIR/$SYSTEM/$BIOSLINK" "$GAMESDIR/TGFX16-CD/$BOOTROM"	
-						[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for TGFX16" >> /tmp/bios.errors 
-				fi
-
-                echo ""
-fi
-} 
+	local SYSTEM_FOLDER=$(find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit)
 	
-
-case "$SYSTEM" in
-	Astrocade)
-		BIOSLINK='Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin' 
-		BOOTROM='boot.rom'
-		if [ -e "$GAMESDIR/$SYSTEM/" ]
-			then
-                		GETTER
-		else
-				echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
-		fi	
-                echo ""
-                echo "##################################################################"
-  ;;
-	Gameboy)
-                BIOSLINK='GB_boot_ROM.gb' 
-                BOOTROM='boot1.rom'	
-		if [ -e "$GAMESDIR/$SYSTEM/" ]
-			then
-                		GETTER
-		else
-				echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
-		fi	
-                echo ""
-                echo "##################################################################"
- 
-  ;;
-      MegaCD)
-                BIOSLINK='US Sega CD 2 (Region Free) 930601 l_oliveira.bin' 
-                BOOTROM='boot.rom'
-		if [ -e "$GAMESDIR/$SYSTEM/" ]
-			then
-                		GETTER
-		else
-				echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
-		fi	
-                echo ""
-                echo "##################################################################"
-  ;;
-
-TurboGrafx16)
-		BIOSLINK='Super CD 3.0.pce'
-                BOOTROM='cd_bios.rom'
-		if [ -e "$GAMESDIR/TGFX16-CD/" ]
-			then
-                		GETTER
-		else
-				echo "Please create a "$GAMESDIR/TGFX16-CD" directory" >> /tmp/dir.errors
-		fi	
-                echo ""
-                echo "##################################################################"
-  ;;
-
-	 NES) 
-                BIOSLINK='fds-bios.rom'
-                BOOTROM='boot0.rom'
-		if [ -e "$GAMESDIR/$SYSTEM/" ]
-			then
-                		GETTER
-		else
-				echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
-		fi	
-                echo ""
-                echo "##################################################################"
-
-  ;;
-      NeoGeo)
-		SKIPNEOGEO=0
-                BIOSLINK='000-lo.lo'
-		BOOTROM='000-lo.lo'
-		if [ -e "$GAMESDIR/$SYSTEM/" ]
+	if [[ "${SYSTEM_FOLDER}" != "" ]]
 		then
-                rm /tmp/neogeo.bios.file 2> /dev/null
-                grep "NEOGEO-BIOS:" "$0" | sed 's/NEOGEO-BIOS://' | while read z
-                do 
-                if [ -e "$GAMESDIR/$SYSTEM/$z" ] 
-			then	
-				echo "$GAMESDIR/$SYSTEM/$z" > /tmp/neogeo.bios.file   
-		
-                fi
-                done 
-                
-		if [ -e /tmp/neogeo.bios.file ] 
-			then
-				echo ""
-				echo "STARTING BIOS RETRVAL FOR: NEOGEO"
-				echo "" 
-				echo "Please please remove the following files and rerun the script if you want them updated." 
-                        	cat /tmp/neogeo.bios.file
-				echo ""
-				echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
-                
-			else
-				GETTER
-				curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR/uni-bios-40.zip" http://unibios.free.fr/download/uni-bios-40.zip 
-				echo " "
-				unzip -o -j "$BIOSDIR/uni-bios-40.zip" -d "$BIOSDIR/$SYSTEM/"
-			
-				cp -vn "$BIOSDIR/$SYSTEM/sfix.sfix" "$GAMESDIR/$SYSTEM/sfix.sfix"
-                                [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
-			
-				cp -vn "$BIOSDIR/$SYSTEM/uni-bios.rom" "$GAMESDIR/$SYSTEM/uni-bios.rom"
-				[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
-                                echo " "
-				echo ""
-                fi 
-		else
+			echo ""
+			echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER" 
+			echo ""
+			GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOTROM}" "${ZIPURL}" "${BIOSLINK}"
+			echo ""
+	else
 			echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
-		fi
-		echo "##################################################################"
-;;
-esac
+	fi	
+			echo ""
+			echo "##################################################################"
+}
 
-done 
+
+GETTER_INTERNAL () 
+
+{ 
+	local SYSTEM_FOLDER="${1}"
+	local BOOTROM="${2}"
+	local ZIPURL="${3}"
+	local BIOSLINK="${4}"
+
+	PATHBOOTROM="$GAMESDIR/$SYSTEM_FOLDER/$BOOTROM"
+	if [ -e "$PATHBOOTROM" ]
+		then
+			echo "Nothing to be done."
+			echo "Skipped '$PATHBOOTROM' because already exists." >> /tmp/bios.errors 
+		else
+
+			local ZIPPATH="$(basename ${ZIPURL})"
+
+			if [ ! -d "$BIOSDIR/${ZIPPATH%.*}" ] ; then
+				mkdir -vp "$BIOSDIR/${ZIPPATH%.*}"
+				echo ""
+
+				curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR"/"${ZIPPATH}" "${ZIPURL}"
+				echo ""
+				unzip -o -j "$BIOSDIR/${ZIPPATH}" -d "$BIOSDIR/${ZIPPATH%.*}/"
+				echo ""
+
+				rm "$BIOSDIR/${ZIPPATH}" 2> /dev/null
+				touch "$BIOSDIR/${ZIPPATH}"
+			fi
+
+			cp -vn "$BIOSDIR/${ZIPPATH%.*}/$BIOSLINK" "$GAMESDIR/$SYSTEM_FOLDER/$BOOTROM"
+			[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM_FOLDER" >> /tmp/bios.errors
+	fi
+}
+
+
+ITERATE_CONSOLES ()
+
+{
+	#FIND CONSOLES
+	find $BASE_PATH/_Console/ -maxdepth 5 -iname \*rbf  -path *_Console* > /tmp/bios-getter.file
+	echo ""
+	echo "Consoles Found:"
+	cat /tmp/bios-getter.file
+	echo "" 
+	echo "Stating to look for needed bios files"
+	sleep 2 
+	echo
+	echo
+	echo "##################################################################"
+	cat /tmp/bios-getter.file| while read i 
+	do 
+
+		local LINE=`basename "$i"`
+		local SYSTEM=`echo "${LINE::-13}"`
+		local LOWERCASE_SYSTEM=$(echo "${SYSTEM}" | awk '{print tolower($0)}')
+		#echo $SYSTEM
+		
+		case "${LOWERCASE_SYSTEM}" in
+			astrocade)
+				GETTER "${SYSTEM}" 'boot.rom' \
+				'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Astrocade.zip' \
+				"Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin"
+				;;
+
+			gameboy)
+				GETTER "${SYSTEM}" 'boot1.rom' \
+				'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
+				'GB_boot_ROM.gb'
+				;;
+
+			megacd)
+				GETTER "${SYSTEM}" 'boot.rom' \
+				'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip' \
+				'US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
+				;;
+
+			turbografx16)
+				mkdir -p "${GAMESDIR}/TGFX16-CD"
+				GETTER 'TGFX16-CD' 'cd_bios.rom' \
+				'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
+				'Super CD 3.0.pce'
+				;;
+
+			nes)
+				GETTER "${SYSTEM}" 'boot0.rom' \
+				'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
+				'fds-bios.rom'
+				;;
+
+			neogeo)
+
+				local BOOTROM='000-lo.lo'
+				local ZIPURL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
+				local BIOSLINK='000-lo.lo'
+
+				local SYSTEM_FOLDER=$(find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit)
+				
+				if [[ "${SYSTEM_FOLDER}" != "" ]]
+					then
+
+						rm /tmp/neogeo.bios.file 2> /dev/null
+						grep "NEOGEO-BIOS:" "$0" | sed 's/NEOGEO-BIOS://' | while read z
+						do 
+							if [ -e "$GAMESDIR/${SYSTEM_FOLDER}/$z" ] 
+								then	
+									echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file   
+							fi
+						done
+
+								echo ""
+								echo "STARTING BIOS RETRIVAL FOR: NEOGEO"
+								echo "" 
+
+						if [ -e /tmp/neogeo.bios.file ] 
+							then
+								echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.errors
+								cat /tmp/neogeo.bios.file >> /tmp/bios.errors
+							else
+								GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOTROM}" "${ZIPURL}" "${BIOSLINK}"
+
+								if [ ! -f "$BIOSDIR/uni-bios-40.zip" ]
+									then
+										curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR/uni-bios-40.zip" http://unibios.free.fr/download/uni-bios-40.zip 
+										echo " "
+										unzip -o -j "$BIOSDIR/uni-bios-40.zip" -d "$BIOSDIR/NeoGeo/"
+										rm "$BIOSDIR/uni-bios-40.zip"
+										touch "$BIOSDIR/uni-bios-40.zip"
+								fi
+
+								cp -vn "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix"
+												[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM_FOLDER" >> /tmp/bios.errors
+							
+								cp -vn "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom"
+								[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM_FOLDER" >> /tmp/bios.errors
+												echo " "
+								echo ""
+						fi
+
+					else
+								echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+				fi
+								echo "##################################################################"
+				;;
+		esac
+
+	done 
+}
+
+ITERATE_CONSOLES
     
 if [ -e /tmp/bios.errors ]
 	then
  		echo "Please remove the existing BIOS files for the console and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
-      		cat /tmp/bios.errors
+      	cat /tmp/bios.errors
 		rm /tmp/bios.errors
-                EXITSTATUS=1 
+        EXITSTATUS=1 
 fi 
 
 if [ -e /tmp/dir.errors ]
@@ -262,7 +281,7 @@ fi
 #clean up zip files 
 if [ -e "$BIOSDIR/*.zip" ]
 	then
-	        rm "$BIOSDIR/*.zip"
+	    rm "$BIOSDIR/*.zip"
 fi 
 
 exit $EXITSTATUS
