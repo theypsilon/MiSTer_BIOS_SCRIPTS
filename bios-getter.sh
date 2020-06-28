@@ -27,11 +27,11 @@ EXITSTATUS=0
 #########Get Script - uncomment for release 
 find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
 do 
-if [ ! -e "$g/update_console-bios-getter.sh" ]
+if [ ! -e "$g/update_bios-getter.sh" ]
     then
-        echo "Downloading update_console-bios-getter.sh to "$g""Q	Q
+        echo "Downloading update_bios-getter.sh to "$g""Q	Q
         echo ""
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$g/update_console-bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_console-bios-getter.sh
+        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$g/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
 
 fi
 done

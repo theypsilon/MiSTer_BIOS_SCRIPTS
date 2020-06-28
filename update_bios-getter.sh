@@ -18,9 +18,9 @@
 
 #Instructions:
 
-#Download the update_console-bios-getter.sh to the Scripts directory and run:
+#Download the update_bios-getter.sh to the Scripts directory and run:
 
-#update_console-bios-getter.sh
+#update_bios-getter.sh
 
 #These scripts look at what RBFconsole core files you have and downloads the bios needed for them.
 
@@ -62,14 +62,14 @@ export SSL_SECURITY_OPTION
 echo "STARTING CONSOLE-BIOS-GETTER"
 echo ""
 
-echo "Downloading the most recent console-bios-getter.sh script."
+echo "Downloading the most recent bios-getter.sh script."
 echo " "
 CURL_RETRY="--connect-timeout 15 --max-time 60 --retry 3 --retry-delay 5 --show-error"
-curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o /tmp/console-bios-getter.sh https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/console-bios-getter.sh
-chmod +x /tmp/console-bios-getter.sh
+curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o /tmp/bios-getter.sh https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/bios-getter.sh
+chmod +x /tmp/bios-getter.sh
 
-/tmp/console-bios-getter.sh
+/tmp/bios-getter.sh
 
-rm /tmp/console-bios-getter.sh
+rm /tmp/bios-getter.sh
 
 echo "FINISHED: CONSOLE-BIOS-GETTER"

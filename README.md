@@ -3,9 +3,9 @@ Simple scripts to automate downloading BIOS files for MiSTer console cores based
 
 Instructions
 
-Download the update_console-bios-getter.sh to the Scripts directory and run:
+Download the update_bios-getter.sh to the Scripts directory and run:
 
-update_console-bios-getter.sh
+update_bios-getter.sh
 
 These scripts look at what RBFconsole core files you have and downloads the bios needed for them.
 
