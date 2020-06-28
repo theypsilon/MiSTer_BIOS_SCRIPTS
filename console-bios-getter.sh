@@ -14,17 +14,27 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+set -u
 
 BIOSDIR="/media/fat/BIOS"
 GAMESDIR="/media/fat/games"
 BASE_PATH="/media/fat"
-OVERWRITE_GAMES_BIOS="true"
 SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
 INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
-# Needs to be changed when a new zip has been uploaded with updated content
-RESOURCES_DATE="$(date -d '2020-06-14 16:35')"
+
+
+#rm -rf /media/fat/BIOS/
+#rm /media/fat/games/Astrocade/boot.rom
+#rm /media/fat/games/GAMEBOY/boot1.rom
+#rm /media/fat/games/MegaCD/boot.rom
+#rm /media/fat/games/NES/boot0.rom
+#rm /media/fat/games/NeoGeo/sfix.sfix
+#rm /media/fat/games/NeoGeo/000-lo.lo
+#rm /media/fat/games/NeoGeo/uni-bios.rom
+#rm /media/fat/games/TGFX16-CD/cd_bios.rom
+
 
 #########Get Script - uncomment for release 
 find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
@@ -58,13 +68,9 @@ if [ `grep -c "BASE_PATH=" "${INIFILE_FIXED}"` -gt 0 ]
    then
       BASE_PATH=`grep "BASE_PATH=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null
-if [ `grep -c "OVERWRITE_GAMES_BIOS=" "${INIFILE_FIXED}"` -gt 0 ]
-   then
-      OVERWRITE_GAMES_BIOS=`grep "OVERWRITE_GAMES_BIOS=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
-fi 2>/dev/null 
 #####INFO TXT#####
 
-if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH|OVERWRITE_GAMES_BIOS" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH" "${INIFILE_FIXED}"` -gt 0 ]
    then
       echo ""
       echo "Using "${INIFILE}"" 
@@ -78,9 +84,9 @@ GETTER ()
 
 {
 	local SYSTEM="${1}"
-	local BOOTROM="${2}"
-	local ZIPURL="${3}"
-	local BIOSLINK="${4}"
+	local BOOT_ROM="${2}"
+	local ZIP_URL="${3}"
+	local BIOS_ROM="${4}"
 
 	local SYSTEM_FOLDER=$(find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit)
 	
@@ -89,7 +95,7 @@ GETTER ()
 			echo ""
 			echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER" 
 			echo ""
-			GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOTROM}" "${ZIPURL}" "${BIOSLINK}"
+			GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
 			echo ""
 	else
 			echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
@@ -103,41 +109,59 @@ GETTER_INTERNAL ()
 
 { 
 	local SYSTEM_FOLDER="${1}"
-	local BOOTROM="${2}"
-	local ZIPURL="${3}"
-	local BIOSLINK="${4}"
+	local BOOT_ROM="${2}"
+	local ZIP_URL="${3}"
+	local BIOS_ROM="${4}"
 
-	PATHBOOTROM="$GAMESDIR/$SYSTEM_FOLDER/$BOOTROM"
-	if [ -e "$PATHBOOTROM" ]
+	local GAMES_TARGET="$GAMESDIR/$SYSTEM_FOLDER/$BOOT_ROM"
+	if [ -e "$GAMES_TARGET" ]
 		then
 			echo "Nothing to be done."
-			echo "Skipped '$PATHBOOTROM' because already exists." >> /tmp/bios.info 
+			echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info 
 		else
 
-			local ZIPPATH="$(basename ${ZIPURL})"
+			local ZIP_PATH="$(basename ${ZIP_URL})"
+			local BIOS_SOURCE="$BIOSDIR/${ZIP_PATH%.*}/$BIOS_ROM"
 
-			if [ ! -d "$BIOSDIR/${ZIPPATH%.*}" ] ; then
-				mkdir -vp "$BIOSDIR/${ZIPPATH%.*}"
+			if [ ! -f "$BIOS_SOURCE" ] ; then
+				mkdir -vp "$BIOSDIR/${ZIP_PATH%.*}"
 				echo ""
 
-				curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR"/"${ZIPPATH}" "${ZIPURL}"
+				curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR"/"${ZIP_PATH}" "${ZIP_URL}"
 				echo ""
-				unzip -o -j "$BIOSDIR/${ZIPPATH}" -d "$BIOSDIR/${ZIPPATH%.*}/"
+				unzip -o -j "$BIOSDIR/${ZIP_PATH}" -d "$BIOSDIR/${ZIP_PATH%.*}/"
 				echo ""
 
-				rm "$BIOSDIR/${ZIPPATH}" 2> /dev/null
-				touch "$BIOSDIR/${ZIPPATH}"
+				rm "$BIOSDIR/${ZIP_PATH}" 2> /dev/null
+				touch "$BIOSDIR/${ZIP_PATH}"
 			fi
 
-			cp -vn "$BIOSDIR/${ZIPPATH%.*}/$BIOSLINK" "$GAMESDIR/$SYSTEM_FOLDER/$BOOTROM"
-			[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM_FOLDER" >> /tmp/bios.errors
+			INSTALL "$BIOS_SOURCE" "$GAMES_TARGET" "$SYSTEM_FOLDER"
 	fi
+}
+
+
+INSTALL ()
+
+{
+	local BIOS_SOURCE="${1}"
+	local GAMES_TARGET="${2}"
+	local SYSTEM="${3}"
+
+	cp -vn "$BIOS_SOURCE" "$GAMES_TARGET"
+	[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
 }
 
 
 ITERATE_CONSOLES ()
 
 {
+	if [ ! -d $BASE_PATH/_Console/ ]
+		then
+			echo "No consoles found"
+			return
+	fi
+
 	#FIND CONSOLES
 	find $BASE_PATH/_Console/ -maxdepth 5 -iname \*rbf  -path *_Console* > /tmp/bios-getter.file
 	echo "Consoles Found:"
@@ -190,9 +214,9 @@ ITERATE_CONSOLES ()
 
 			neogeo)
 
-				local BOOTROM='000-lo.lo'
-				local ZIPURL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
-				local BIOSLINK='000-lo.lo'
+				local BOOT_ROM='000-lo.lo'
+				local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
+				local BIOS_ROM='000-lo.lo'
 
 				local SYSTEM_FOLDER=$(find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit)
 				
@@ -203,7 +227,7 @@ ITERATE_CONSOLES ()
 						do 
 							if [ -e "$GAMESDIR/${SYSTEM_FOLDER}/$z" ] 
 								then
-									echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file   i
+									echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file
 							fi
 						done
 
@@ -216,24 +240,18 @@ ITERATE_CONSOLES ()
 								echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.info
 								cat /tmp/neogeo.bios.file >> /tmp/bios.info
 							else
-								GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOTROM}" "${ZIPURL}" "${BIOSLINK}"
+								GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
 
-								if [ ! -f "$BIOSDIR/uni-bios-40.zip" ]
+								if [ ! -f "$BIOSDIR/NeoGeo/sfix.sfix" ] || [ ! -f "$BIOSDIR/NeoGeo/uni-bios.rom" ]
 									then
 										curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR/uni-bios-40.zip" http://unibios.free.fr/download/uni-bios-40.zip 
 										echo " "
 										unzip -o -j "$BIOSDIR/uni-bios-40.zip" -d "$BIOSDIR/NeoGeo/"
 										rm "$BIOSDIR/uni-bios-40.zip"
-										touch "$BIOSDIR/uni-bios-40.zip"
 								fi
 
-								cp -vn "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix"
-												[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM_FOLDER" >> /tmp/bios.errors
-							
-								cp -vn "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom"
-								[ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM_FOLDER" >> /tmp/bios.errors
-												echo " "
-								echo ""
+								INSTALL "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
+								INSTALL "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
 						fi
 
 					else
@@ -253,12 +271,6 @@ ITERATE_CONSOLES ()
 rm -v /tmp/bios.errors 2> /dev/null
 rm -v /tmp/bios.info 2> /dev/null
 rm -v /tmp/dir.errors 2> /dev/null
-
-if [ ! -f "${BIOSDIR}/date" ] || [[ "${RESOURCES_DATE}" > "$(cat ${BIOSDIR}/date)" ]]; then
-	rm -rf "${BIOSDIR}" 2> /dev/null
-	echo "BIOS folder is not yet installed or is not up-to-date."
-	echo
-fi
 
 mkdir -p "$BIOSDIR"
 
@@ -292,11 +304,6 @@ fi
 if [ -e "$BIOSDIR/*.zip" ]
 	then
 	    rm "$BIOSDIR/*.zip"
-fi
-
-if [[ "${EXITSTATUS}" == "0" ]] && [ ! -f "${BIOSDIR}/date" ]
-	then
-		echo "${RESOURCES_DATE}" > "${BIOSDIR}/date"
 fi
 
 exit $EXITSTATUS
