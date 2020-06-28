@@ -133,7 +133,6 @@ GETTER_INTERNAL ()
 				echo ""
 
 				rm "$BIOSDIR/${ZIP_PATH}" 2> /dev/null
-				touch "$BIOSDIR/${ZIP_PATH}"
 			fi
 
 			INSTALL "$BIOS_SOURCE" "$GAMES_TARGET" "$SYSTEM_FOLDER"
