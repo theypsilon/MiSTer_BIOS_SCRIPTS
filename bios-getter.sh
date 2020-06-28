@@ -25,14 +25,14 @@ INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
 
 #########Get Script - uncomment for release 
-find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
+find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read SCRIPTS_PATH
 do 
-if [ ! -e "$g/update_bios-getter.sh" ]
+if [ ! -e "$SCRIPTS_PATH/update_bios-getter.sh" ]
     then
-        echo "Downloading update_bios-getter.sh to "$g""Q	Q
+        echo "Downloading update_bios-getter.sh to "$SCRIPTS_PATH""
         echo ""
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$g/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
-
+        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$SCRIPTS_PATH/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
+        echo
 fi
 done
 
