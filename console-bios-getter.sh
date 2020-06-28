@@ -24,18 +24,6 @@ CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show
 INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
 
-
-rm -rf /media/fat/BIOS/
-rm /media/fat/games/Astrocade/boot.rom
-rm /media/fat/games/GAMEBOY/boot1.rom
-rm /media/fat/games/MegaCD/boot.rom
-rm /media/fat/games/NES/boot0.rom
-rm /media/fat/games/NeoGeo/sfix.sfix
-rm /media/fat/games/NeoGeo/000-lo.lo
-rm /media/fat/games/NeoGeo/uni-bios.rom
-rm /media/fat/games/TGFX16-CD/cd_bios.rom
-
-
 #########Get Script - uncomment for release 
 find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read g
 do 
@@ -55,26 +43,26 @@ fi
 
 
 if [ `grep -c "BIOSDIR=" "${INIFILE_FIXED}"` -gt 0 ]
-   then
-      BIOSDIR=`grep "BIOSDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+    then
+        BIOSDIR=`grep "BIOSDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null 
 
 if [ `grep -c "GAMESDIR=" "${INIFILE_FIXED}"` -gt 0 ]
-   then
-      GAMESDIR=`grep "GAMESDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+    then
+        GAMESDIR=`grep "GAMESDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null 
 
 if [ `grep -c "BASE_PATH=" "${INIFILE_FIXED}"` -gt 0 ]
-   then
-      BASE_PATH=`grep "BASE_PATH=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+    then
+        BASE_PATH=`grep "BASE_PATH=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null
 #####INFO TXT#####
 
 if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH" "${INIFILE_FIXED}"` -gt 0 ]
-   then
-      echo ""
-      echo "Using "${INIFILE}"" 
-      echo ""
+    then
+        echo ""
+        echo "Using "${INIFILE}"" 
+        echo ""
 fi 2>/dev/null 
 
 rm ${INIFILE_FIXED}
@@ -295,15 +283,15 @@ ITERATE_SYSTEMS
     
 if [ -e /tmp/bios.info ]
     then
-         echo "Please remove the existing BIOS files for the system and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
-          cat /tmp/bios.info
+        echo "Please remove the existing BIOS files for the system and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
+        cat /tmp/bios.info
         rm /tmp/bios.info
 fi 
 
 if [ -e /tmp/bios.errors ]
     then
-         echo "Following errors ocurred."
-          cat /tmp/bios.errors
+        echo "Following errors ocurred."
+        cat /tmp/bios.errors
         rm /tmp/bios.errors
         EXITSTATUS=1 
 fi 
