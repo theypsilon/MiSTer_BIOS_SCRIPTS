@@ -174,6 +174,7 @@ INSTALL ()
 ITERATE_SYSTEMS ()
 
 {
+    echo ""
     echo "Systems checked:"
     printf ' %s\n' "${SYSTEMS_WITH_BIOS[@]}"
     sleep 2 
