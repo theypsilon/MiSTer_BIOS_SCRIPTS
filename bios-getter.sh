@@ -24,7 +24,7 @@ CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show
 INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
 
-#########Get Script - uncomment for release 
+#########Get Script
 find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read SCRIPTS_PATH
 do 
 if [ ! -e "$SCRIPTS_PATH/update_bios-getter.sh" ]
