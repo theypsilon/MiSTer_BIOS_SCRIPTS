@@ -25,15 +25,15 @@ INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
 EXITSTATUS=0
 
 
-#rm -rf /media/fat/BIOS/
-#rm /media/fat/games/Astrocade/boot.rom
-#rm /media/fat/games/GAMEBOY/boot1.rom
-#rm /media/fat/games/MegaCD/boot.rom
-#rm /media/fat/games/NES/boot0.rom
-#rm /media/fat/games/NeoGeo/sfix.sfix
-#rm /media/fat/games/NeoGeo/000-lo.lo
-#rm /media/fat/games/NeoGeo/uni-bios.rom
-#rm /media/fat/games/TGFX16-CD/cd_bios.rom
+rm -rf /media/fat/BIOS/
+rm /media/fat/games/Astrocade/boot.rom
+rm /media/fat/games/GAMEBOY/boot1.rom
+rm /media/fat/games/MegaCD/boot.rom
+rm /media/fat/games/NES/boot0.rom
+rm /media/fat/games/NeoGeo/sfix.sfix
+rm /media/fat/games/NeoGeo/000-lo.lo
+rm /media/fat/games/NeoGeo/uni-bios.rom
+rm /media/fat/games/TGFX16-CD/cd_bios.rom
 
 
 #########Get Script - uncomment for release 
@@ -79,6 +79,37 @@ fi 2>/dev/null
 
 rm ${INIFILE_FIXED}
 
+SYSTEMS_WITH_BIOS=( \
+	Astrocade \
+	Gameboy \
+	MegaCD \
+	TurboGrafx16 \
+	NES \
+	NeoGeo \
+)
+
+NEOGEO_BIOS=( \
+	"000-lo\.lo" \
+	"japan-j3\.bin" \
+	"sfix\.sfix" \
+	"sm1\.sm1" \
+	"sp1-j3\.bin" \
+	"sp1\.jipan\.1024" \
+	"sp1-u2" \
+	"sp1-u3\.bin" \
+	"sp1-u4\.bin" \
+	"sp-1v1_3db8c" \
+	"sp-45\.sp1" \
+	"sp-e\.sp1" \
+	"sp-j2\.sp1" \
+	"sp-j3\.sp1" \
+	"sp-s2\.sp1" \
+	"sp-s3\.sp1" \
+	"sp-s\.sp1" \
+	"sp-u2\.sp1" \
+	"uni-bios.*\.rom" \
+	"vs-bios\.rom" \
+)
 
 GETTER ()
 
@@ -152,32 +183,18 @@ INSTALL ()
 }
 
 
-ITERATE_CONSOLES ()
+ITERATE_SYSTEMS ()
 
 {
-	if [ ! -d $BASE_PATH/_Console/ ]
-		then
-			echo "No consoles found"
-			return
-	fi
-
-	#FIND CONSOLES
-	find $BASE_PATH/_Console/ -maxdepth 5 -iname \*rbf  -path *_Console* > /tmp/bios-getter.file
-	echo "Consoles Found:"
-	cat /tmp/bios-getter.file
-	echo "" 
-	echo "Stating to look for needed bios files"
+	echo "Systems checked:"
+	printf ' %s\n' "${SYSTEMS_WITH_BIOS[@]}"
 	sleep 2 
 	echo
 	echo
 	echo "##################################################################"
-	cat /tmp/bios-getter.file| while read i 
+	for SYSTEM in ${SYSTEMS_WITH_BIOS[@]}
 	do 
-
-		local LINE=`basename "$i"`
-		local SYSTEM=`echo "${LINE::-13}"`
 		local LOWERCASE_SYSTEM=$(echo "${SYSTEM}" | awk '{print tolower($0)}')
-		#echo $SYSTEM
 		
 		case "${LOWERCASE_SYSTEM}" in
 			astrocade)
@@ -222,12 +239,13 @@ ITERATE_CONSOLES ()
 				if [[ "${SYSTEM_FOLDER}" != "" ]]
 					then
 						rm /tmp/neogeo.bios.file 2> /dev/null
-						grep "NEOGEO-BIOS:" "$0" | sed 's/NEOGEO-BIOS://' | while read z
-						do 
-							if [ -e "$GAMESDIR/${SYSTEM_FOLDER}/$z" ] 
-								then
-									echo "  $GAMESDIR/${SYSTEM_FOLDER}/$z" >> /tmp/neogeo.bios.file
-							fi
+						for NEO_BIOS_REGEX in ${NEOGEO_BIOS[@]}
+						do
+							find "$GAMESDIR/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "$GAMESDIR/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
+							while read NEO_BIOS_PATH
+							do
+								echo "  $NEO_BIOS_PATH" >> /tmp/neogeo.bios.file
+							done
 						done
 
 								echo ""
@@ -273,11 +291,11 @@ rm -v /tmp/dir.errors 2> /dev/null
 
 mkdir -p "$BIOSDIR"
 
-ITERATE_CONSOLES
+ITERATE_SYSTEMS
     
 if [ -e /tmp/bios.info ]
 	then
- 		echo "Please remove the existing BIOS files for the console and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
+ 		echo "Please remove the existing BIOS files for the system and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
       	cat /tmp/bios.info
 		rm /tmp/bios.info
 fi 
@@ -299,32 +317,4 @@ if [ -e /tmp/dir.errors ]
 		EXITSTATUS=1
 fi
 
-#clean up zip files 
-if [ -e "$BIOSDIR/*.zip" ]
-	then
-	    rm "$BIOSDIR/*.zip"
-fi
-
 exit $EXITSTATUS
-
-#NEOGEO-BIOS 
-NEOGEO-BIOS:000-lo.lo
-NEOGEO-BIOS:japan-j3.bin
-NEOGEO-BIOS:sfix.sfix
-NEOGEO-BIOS:sm1.sm1
-NEOGEO-BIOS:sp1-j3.bin
-NEOGEO-BIOS:sp1.jipan.1024
-NEOGEO-BIOS:sp1-u2
-NEOGEO-BIOS:sp1-u3.bin
-NEOGEO-BIOS:sp1-u4.bin
-NEOGEO-BIOS:sp-1v1_3db8c
-NEOGEO-BIOS:sp-45.sp1
-NEOGEO-BIOS:sp-e.sp1
-NEOGEO-BIOS:sp-j2.sp1
-NEOGEO-BIOS:sp-j3.sp1
-NEOGEO-BIOS:sp-s2.sp1
-NEOGEO-BIOS:sp-s3.sp1
-NEOGEO-BIOS:sp-s.sp1
-NEOGEO-BIOS:sp-u2.sp1
-NEOGEO-BIOS:uni-bios*rom
-NEOGEO-BIOS:vs-bios.rom
