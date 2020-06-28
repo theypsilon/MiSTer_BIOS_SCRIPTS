@@ -300,7 +300,7 @@ fi
 if [ -e /tmp/dir.errors ]
     then
         echo ""
-        echo "The following directoires are need for this script. Please create and orgaize your roms/files in the following directoies."
+        echo "The following directories are need for this script. Please create and organize your roms/files in the following directoies."
         cat /tmp/dir.errors
         rm /tmp/dir.errors
         EXITSTATUS=1
