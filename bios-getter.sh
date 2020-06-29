@@ -21,7 +21,7 @@ GAMESDIR="/media/fat/games"
 BASE_PATH="/media/fat"
 SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
-INIFILE="/media/fat/Scripts/update_console-bios-getter.ini"
+INIFILE="/media/fat/Scripts/update_bios-getter.ini"
 EXITSTATUS=0
 
 #########Get Script
