@@ -18,7 +18,6 @@ set -u
 
 BIOSDIR="/media/fat/BIOS"
 GAMESDIR="/media/fat/games"
-BASE_PATH="/media/fat"
 SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
 INIFILE="/media/fat/Scripts/update_bios-getter.ini"
@@ -51,14 +50,9 @@ if [ `grep -c "GAMESDIR=" "${INIFILE_FIXED}"` -gt 0 ]
     then
         GAMESDIR=`grep "GAMESDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
 fi 2>/dev/null 
-
-if [ `grep -c "BASE_PATH=" "${INIFILE_FIXED}"` -gt 0 ]
-    then
-        BASE_PATH=`grep "BASE_PATH=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
-fi 2>/dev/null
 #####INFO TXT#####
 
-if [ `egrep -c "BIOSDIR|GAMESDIR|BASE_PATH" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "BIOSDIR|GAMESDIR" "${INIFILE_FIXED}"` -gt 0 ]
     then
         echo ""
         echo "Using "${INIFILE}"" 

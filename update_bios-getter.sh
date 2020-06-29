@@ -40,7 +40,7 @@
 
 #Q: Can I set this to work with usb drives?
 
-#A: yes,in the update_bios-getter.ini: BASE_PATH=/media/usb0
+#A: yes,in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
 
 #You should back up your bios files before running this script.
 
