@@ -17,9 +17,9 @@ A: NO, This script will not clober files you already have. You need to manaully 
 
 Q: Where are the Downloaded BIOS files located?
 
-A: This script downloads all bios files to /media/fat/BIOS. Symlinks are used in the consoles games directory to link back to the BIOS directory.
+A: This script downloads all bios files to /media/fat/BIOS.
 
-Q: Can I set a custom BIOS directory location.
+Q: Can I set a custom BIOS directory location?
 
 A: Yes, in the update_bios-getter.ini: BIOSDIR=/path/to/your/location
 
