@@ -93,6 +93,8 @@ NEOGEO_BIOS=( \
     "vs-bios\.rom" \
 )
 
+NOTHING_TO_BE_DONE_MSG="Nothing to be done."
+
 GETTER ()
 
 {
@@ -101,7 +103,7 @@ GETTER ()
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
 
-    local SYSTEM_FOLDER=$(find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit)
+    local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
     
     if [[ "${SYSTEM_FOLDER}" != "" ]]
         then
@@ -129,7 +131,7 @@ GETTER_INTERNAL ()
     local GAMES_TARGET="$GAMESDIR/$SYSTEM_FOLDER/$BOOT_ROM"
     if [ -e "$GAMES_TARGET" ]
         then
-            echo "Nothing to be done."
+            echo "${NOTHING_TO_BE_DONE_MSG}"
             echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info 
         else
 
@@ -153,6 +155,14 @@ GETTER_INTERNAL ()
 }
 
 
+GET_SYSTEM_FOLDER()
+
+{
+    local SYSTEM="${1}"
+    find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit
+}
+
+
 INSTALL ()
 
 {
@@ -162,6 +172,23 @@ INSTALL ()
 
     cp -vn "$BIOS_SOURCE" "$GAMES_TARGET"
     [ $? -ne 0 ] && echo "ERROR: BIOS was not able to be set for $SYSTEM" >> /tmp/bios.errors
+}
+
+
+INSTALL_MEGACD_REGION ()
+
+{
+    local SYSTEM_FOLDER="${1}"
+    local BIOS_SOURCE="${2}"
+    local REGION="${3}"
+
+    local GAMES_TARGET="${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}/cd_bios.rom"
+    if [ -f "${GAMES_TARGET}" ] ; then
+        echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info
+    elif [ -f "${BIOS_SOURCE}" ] ; then
+        mkdir -p "${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}"
+        INSTALL "${BIOS_SOURCE}" "${GAMES_TARGET}" "${SYSTEM_FOLDER}"
+    fi
 }
 
 
@@ -193,9 +220,36 @@ ITERATE_SYSTEMS ()
                 ;;
 
             megacd)
-                GETTER "${SYSTEM}" 'boot.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip' \
-                'US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
+                local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
+                if [[ "${SYSTEM_FOLDER}" != "" ]]
+                    then
+                        echo ""
+                        echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER"
+                        echo ""
+                        local BOOT_ROM='boot.rom'
+                        local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
+                        local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
+                        if [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}" ] && \
+                            [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom" ] && \
+                            [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom" ] && \
+                            [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom" ]
+                        then
+                            echo "${NOTHING_TO_BE_DONE_MSG}"
+                        else
+                            local MESSAGE=$(GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}")
+                            if [[ "${MESSAGE}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+                                echo "${MESSAGE}"
+                            fi
+                            INSTALL_MEGACD_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/MegaCD/[BIOS] Mega-CD 2 (Japan) (v2.00C).md" "Japan"
+                            INSTALL_MEGACD_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/MegaCD/[BIOS] Sega CD 2 (USA) (v2.00).md" "USA"
+                            INSTALL_MEGACD_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/MegaCD/[BIOS] Mega-CD 2 (Europe) (v2.00).md" "Europe"
+                        fi
+                        echo
+                else
+                        echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+                fi
+                        echo ""
+                        echo "##################################################################"
                 ;;
 
             turbografx16)
@@ -212,12 +266,7 @@ ITERATE_SYSTEMS ()
                 ;;
 
             neogeo)
-
-                local BOOT_ROM='000-lo.lo'
-                local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
-                local BIOS_ROM='000-lo.lo'
-
-                local SYSTEM_FOLDER=$(find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit)
+                local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
                 
                 if [[ "${SYSTEM_FOLDER}" != "" ]]
                     then
@@ -237,9 +286,13 @@ ITERATE_SYSTEMS ()
 
                         if [ -e /tmp/neogeo.bios.file ] 
                             then
+                                echo "${NOTHING_TO_BE_DONE_MSG}"
                                 echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.info
                                 cat /tmp/neogeo.bios.file >> /tmp/bios.info
                             else
+                                local BOOT_ROM='000-lo.lo'
+                                local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
+                                local BIOS_ROM='000-lo.lo'
                                 GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
 
                                 if [ ! -f "$BIOSDIR/NeoGeo/sfix.sfix" ] || [ ! -f "$BIOSDIR/NeoGeo/uni-bios.rom" ]
@@ -253,10 +306,11 @@ ITERATE_SYSTEMS ()
                                 INSTALL "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
                                 INSTALL "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
                         fi
-
+                        echo
                     else
                                 echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
                 fi
+                                echo ""
                                 echo "##################################################################"
                 ;;
         esac
