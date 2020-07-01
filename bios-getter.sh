@@ -329,10 +329,12 @@ rm -v /tmp/dir.errors 2> /dev/null
 mkdir -p "$BIOSDIR"
 
 ITERATE_SYSTEMS
-    
+
+echo
+
 if [ -e /tmp/bios.info ]
     then
-        echo "Please remove the existing BIOS files for the system and rerun the script if you want them updated. If you want to keep the current BIOS files no action is needed."
+        echo "Please remove the existing BIOS files for the system and rerun if you want them updated. If you want to keep the current BIOS files no action is needed."
         cat /tmp/bios.info
         rm /tmp/bios.info
 fi 
@@ -347,11 +349,21 @@ fi
 
 if [ -e /tmp/dir.errors ]
     then
-        echo ""
         echo "The following directories are need for this script. Please create and organize your roms/files in the following directoies."
         cat /tmp/dir.errors
         rm /tmp/dir.errors
         EXITSTATUS=1
 fi
+
+echo
+
+if [ $EXITSTATUS -eq 0 ]
+    then
+        echo "SUCCESS!"
+else
+        echo "Some error occurred."        
+fi
+
+echo
 
 exit $EXITSTATUS
