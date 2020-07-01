@@ -63,4 +63,4 @@ The bios-getter willdownload many bios files to /media/fat/BIOS however, we have
 
 **You should back up your bios files before running this script.**
 
-USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
+USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTY AND MAY KILL BABY SEALS.
