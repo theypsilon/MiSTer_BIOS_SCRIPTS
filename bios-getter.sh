@@ -226,7 +226,7 @@ ITERATE_SYSTEMS ()
                         echo ""
                         echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER"
                         echo ""
-                        local BOOT_ROM='cd_bios.rom'
+                        local BOOT_ROM='boot.rom'
                         local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
                         local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
                         local MEGACD_BIOSES=(
