@@ -24,16 +24,13 @@ INIFILE="/media/fat/Scripts/update_bios-getter.ini"
 EXITSTATUS=0
 
 #########Get Script
-find /media/fat/ -maxdepth 5 -type d -name Scripts | sort -u | while read SCRIPTS_PATH
-do 
-if [ ! -e "$SCRIPTS_PATH/update_bios-getter.sh" ]
+if [ ! -e "/media/fat/Scripts/update_bios-getter.sh" ]
     then
-        echo "Downloading update_bios-getter.sh to "$SCRIPTS_PATH""
+        echo "Downloading update_bios-getter.sh to /media/fat/Scripts"
         echo ""
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "$SCRIPTS_PATH/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
+        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "/media/fat/Scripts/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
         echo
 fi
-done
 
 INIFILE_FIXED=$(mktemp)
 if [[ -f "${INIFILE}" ]] ; then
