@@ -46,7 +46,7 @@
 
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
 
-####################################################################################################
+#####################################################################################################
 SSL_SECURITY_OPTION=""
 curl ${CURL_RETRY} "https://github.com" > /dev/null 2>&1
 case $? in
