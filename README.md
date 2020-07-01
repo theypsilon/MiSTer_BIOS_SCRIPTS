@@ -28,10 +28,14 @@ A: Yes, in the update_bios-getter.ini: BIOSDIR=/path/to/your/location
 The bios-getter willdownload many bios files to /media/fat/BIOS however, we have chosen some sane defaults to be copyed to the /games/<console> directory. These defaults are:
   
   Astrocade
-  ```Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin```
+  ```
+  Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin
+  ```
   
   Gameboy
-  ```GB_boot_ROM.gb```
+  ```
+  GB_boot_ROM.gb
+  ```
   
   MegaCD    
   ```
@@ -48,10 +52,14 @@ The bios-getter willdownload many bios files to /media/fat/BIOS however, we have
  ```
  
  NES
- ```fds-bios.rom```
+ ```
+ fds-bios.rom
+ ```
  
  TGFX16-CD
- ```Super CD 3.0.pce```
+ ```
+ Super CD 3.0.pce
+ ```
 
 **You should back up your bios files before running this script.**
 
