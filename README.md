@@ -32,7 +32,9 @@ The bios-getter willdownload many bios files to /media/fat/BIOS however, we have
   Gameboy -   GB_boot_ROM.gb
   
   MegaCD -    [BIOS] Mega-CD 2 (Japan) (v2.00C).md" "Japan"
+              
               [BIOS] Sega CD 2 (USA) (v2.00).md" "USA"
+              
               [BIOS] Mega-CD 2 (Europe) (v2.00).md" "Europe"
  
  NeoGeo -     000-lo.lo
