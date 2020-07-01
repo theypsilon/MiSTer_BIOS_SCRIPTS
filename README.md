@@ -7,7 +7,7 @@ Download the update_bios-getter.sh to the Scripts directory and run:
 
 update_bios-getter.sh
 
-These scripts DO NOT download any cores. 
+This script DOES NOT download any cores. 
 
 Q:Will this script over write files I already have?
 
