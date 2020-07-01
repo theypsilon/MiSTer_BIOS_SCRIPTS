@@ -229,12 +229,22 @@ ITERATE_SYSTEMS ()
                         local BOOT_ROM='boot.rom'
                         local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
                         local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
-                        if [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}" ] && \
-                            [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom" ] && \
-                            [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom" ] && \
-                            [ -e "${GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom" ]
+                        local MEGACD_BIOSES=(
+                            "${GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}"
+                            "${GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom"
+                            "${GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom"
+                            "${GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom"
+                        )
+                        local ALL_TRUE="true"
+                        for bios in ${MEGACD_BIOSES[@]} ; do
+                            [ -e "${bios}" ] || ALL_TRUE="false"
+                        done
+                        if [[ "${ALL_TRUE}" == "true" ]]
                         then
                             echo "${NOTHING_TO_BE_DONE_MSG}"
+                            for bios in ${MEGACD_BIOSES[@]} ; do
+                                echo "Skipped '${bios}' because already exists." >> /tmp/bios.info
+                            done
                         else
                             local MESSAGE=$(GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}")
                             if [[ "${MESSAGE}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
