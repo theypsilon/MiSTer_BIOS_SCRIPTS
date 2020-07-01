@@ -65,9 +65,9 @@ SYSTEMS_WITH_BIOS=( \
     Astrocade \
     Gameboy \
     MegaCD \
-    TurboGrafx16 \
-    NES \
     NeoGeo \
+    NES \
+    TurboGrafx16 \
 )
 
 NEOGEO_BIOS=( \
@@ -252,19 +252,6 @@ ITERATE_SYSTEMS ()
                         echo "##################################################################"
                 ;;
 
-            turbografx16)
-                mkdir -p "${GAMESDIR}/TGFX16-CD"
-                GETTER 'TGFX16-CD' 'cd_bios.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
-                'Super CD 3.0.pce'
-                ;;
-
-            nes)
-                GETTER "${SYSTEM}" 'boot0.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
-                'fds-bios.rom'
-                ;;
-
             neogeo)
                 local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
                 
@@ -312,6 +299,19 @@ ITERATE_SYSTEMS ()
                 fi
                                 echo ""
                                 echo "##################################################################"
+                ;;
+
+            nes)
+                GETTER "${SYSTEM}" 'boot0.rom' \
+                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
+                'fds-bios.rom'
+                ;;
+
+            turbografx16)
+                mkdir -p "${GAMESDIR}/TGFX16-CD"
+                GETTER 'TGFX16-CD' 'cd_bios.rom' \
+                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
+                'Super CD 3.0.pce'
                 ;;
         esac
 
