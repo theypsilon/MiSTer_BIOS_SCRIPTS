@@ -36,7 +36,12 @@ The bios-getter willdownload many bios files to /media/fat/BIOS however, we have
   ```
   GB_boot_ROM.gb
   ```
-  
+
+  GBA
+  ```
+  gba_bios.bin
+  ```
+
   MegaCD    
   ```
   [BIOS] Mega-CD 2 (Japan) (v2.00C).md" "Japan"
