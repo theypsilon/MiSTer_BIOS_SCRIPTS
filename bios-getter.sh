@@ -61,6 +61,7 @@ rm ${INIFILE_FIXED}
 SYSTEMS_WITH_BIOS=( \
     Astrocade \
     Gameboy \
+    GBA \
     MegaCD \
     NeoGeo \
     NES \
@@ -214,6 +215,12 @@ ITERATE_SYSTEMS ()
                 GETTER "${SYSTEM}" 'boot1.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
                 'GBC_boot_ROM.gb'
+                ;;
+
+            gba)
+                GETTER "${SYSTEM}" 'boot.rom' \
+                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/GBA.zip' \
+                'gba_bios.bin'
                 ;;
 
             megacd)
