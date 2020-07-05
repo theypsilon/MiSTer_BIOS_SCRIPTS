@@ -219,7 +219,7 @@ ITERATE_SYSTEMS ()
 
             gba)
                 GETTER "${SYSTEM}" 'boot.rom' \
-                'https://archive.org/download/gba_20200705/GBA.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/GBA.zip' \
                 'gba_bios.bin'
                 ;;
 
