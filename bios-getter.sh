@@ -213,7 +213,7 @@ ITERATE_SYSTEMS ()
             gameboy)
                 GETTER "${SYSTEM}" 'boot1.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
-                'GB_boot_ROM.gb'
+                'GBC_boot_ROM.gb'
                 ;;
 
             megacd)
