@@ -65,6 +65,7 @@ echo "STARTING CONSOLE-BIOS-GETTER"
 echo ""
 echo "Downloading the most recent ${BIOS_GETTER} script."
 echo ""
+
 curl \
     --location \
     --connect-timeout 15 \
@@ -73,7 +74,11 @@ curl \
     --retry-delay 5 \
     --show-error \
     ${SSL_SECURITY_OPTION} \
-    ${URL}${BIOS_GETTER} | bash -
+    --output /tmp/${BIOS_GETTER} \
+    ${URL}${BIOS_GETTER}
+    
+bash /tmp/${BIOS_GETTER} && rm /tmp/${BIOS_GETTER}
+
 echo "FINISHED: CONSOLE-BIOS-GETTER"
 
 exit 0
