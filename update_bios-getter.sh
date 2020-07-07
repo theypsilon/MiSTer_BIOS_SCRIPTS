@@ -59,17 +59,26 @@ case $? in
 esac
 export SSL_SECURITY_OPTION
 
+BIOS_GETTER="bios-getter.sh"
+URL="https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/"
 echo "STARTING CONSOLE-BIOS-GETTER"
 echo ""
+echo "Downloading the most recent ${BIOS_GETTER} script."
+echo ""
 
-echo "Downloading the most recent bios-getter.sh script."
-echo " "
-CURL_RETRY="--connect-timeout 15 --max-time 60 --retry 3 --retry-delay 5 --show-error"
-curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o /tmp/bios-getter.sh https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/bios-getter.sh
-chmod +x /tmp/bios-getter.sh
-
-/tmp/bios-getter.sh
-
-rm /tmp/bios-getter.sh
+curl \
+    --location \
+    --connect-timeout 15 \
+    --max-time 60 \
+    --retry 3 \
+    --retry-delay 5 \
+    --show-error \
+    ${SSL_SECURITY_OPTION} \
+    --output /tmp/${BIOS_GETTER} \
+    ${URL}${BIOS_GETTER}
+    
+bash /tmp/${BIOS_GETTER} && rm /tmp/${BIOS_GETTER}
 
 echo "FINISHED: CONSOLE-BIOS-GETTER"
+
+exit 0
