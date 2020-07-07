@@ -22,6 +22,68 @@ SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
 CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
 INIFILE="/media/fat/Scripts/update_bios-getter.ini"
 EXITSTATUS=0
+NOTHING_TO_BE_DONE_MSG="Nothing to be done."
+
+SYSTEMS_WITH_BIOS=( \
+    Astrocade \
+    Gameboy \
+    GBA \
+    MegaCD \
+    NeoGeo \
+    NES \
+    TurboGrafx16 \
+)
+
+NEOGEO_BIOS=( \
+    "000-lo\.lo" \
+    "japan-j3\.bin" \
+    "sfix\.sfix" \
+    "sm1\.sm1" \
+    "sp1-j3\.bin" \
+    "sp1\.jipan\.1024" \
+    "sp1-u2" \
+    "sp1-u3\.bin" \
+    "sp1-u4\.bin" \
+    "sp-1v1_3db8c" \
+    "sp-45\.sp1" \
+    "sp-e\.sp1" \
+    "sp-j2\.sp1" \
+    "sp-j3\.sp1" \
+    "sp-s2\.sp1" \
+    "sp-s3\.sp1" \
+    "sp-s\.sp1" \
+    "sp-u2\.sp1" \
+    "uni-bios.*\.rom" \
+    "vs-bios\.rom" \
+)
+
+ASTROCADE_BIOS_SHA1_HASHES=( \
+    "D84341FEEC1A0A0E8AA6151B649BC3CF6EF69FBF" `# Bally Computer System 'White' BIOS (1977)(Bally Mfg. Corp.).bin` \
+    "6B2BEF5D970E54ED204549F58BA6D197A8BFD3CC" `# Bally Home Library Computer '3164' BIOS (1977)(Bally Mfg. Corp.).bin` \
+    "B902C941997C9D150A560435BF517C6A28137ECC" `# Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin` \
+)
+
+GAMEBOY_BIOS_SHA1_HASHES=( \
+    "4ED31EC6B0B175BB109C0EB5FD3D193DA823339F" `# GB_boot_ROM.gb` \
+    "1293D68BF9643BC4F36954C1E80E38F39864528D" `# GBC_boot_ROM.gb` \
+)
+
+GBA_BIOS_SHA1_HASHES=( \
+    "AA98A2AD32B86106340665D1222D7D973A1361C7" `#[BIOS] Game Boy Advance (Japan) (Debug Version).gba` \
+    "300C20DF6731A33952DED8C436F7F186D25D3492" `#gba_bios.bin` \
+)
+
+MEGACD_BIOS_SHA1_HASHES=()
+#
+
+NEOGEO_BIOS_SHA1_HASHES=()
+#
+
+NES_BIOS_SHA1_HASHES=( \
+    "AF5AF53F66982E749643FDF8B2ACBB7D4D3ED229" `# fds-bios (Beta).rom` \
+    "E4E41472C454F928E53EB10E0509BF7D1146ECC1" `# fds-bios (Twin Famicom).rom` \
+    "57FE1BDEE955BB48D357E463CCBF129496930B62" `# fds-bios.rom` \
+)
 
 #########Get Script
 if [ ! -e "/media/fat/Scripts/update_bios-getter.sh" ]
@@ -58,40 +120,23 @@ fi 2>/dev/null
 
 rm ${INIFILE_FIXED}
 
-SYSTEMS_WITH_BIOS=( \
-    Astrocade \
-    Gameboy \
-    GBA \
-    MegaCD \
-    NeoGeo \
-    NES \
-    TurboGrafx16 \
-)
+# takes in hashlist and file to hash
+# returns sha1 if matched and false if not
+ISSHA1VALID() {
+    local hashlist=("$1")
+    local script_sha1=($(sha1sum $2))
+    local matched="false"
 
-NEOGEO_BIOS=( \
-    "000-lo\.lo" \
-    "japan-j3\.bin" \
-    "sfix\.sfix" \
-    "sm1\.sm1" \
-    "sp1-j3\.bin" \
-    "sp1\.jipan\.1024" \
-    "sp1-u2" \
-    "sp1-u3\.bin" \
-    "sp1-u4\.bin" \
-    "sp-1v1_3db8c" \
-    "sp-45\.sp1" \
-    "sp-e\.sp1" \
-    "sp-j2\.sp1" \
-    "sp-j3\.sp1" \
-    "sp-s2\.sp1" \
-    "sp-s3\.sp1" \
-    "sp-s\.sp1" \
-    "sp-u2\.sp1" \
-    "uni-bios.*\.rom" \
-    "vs-bios\.rom" \
-)
+    for i in ${hashlist[@]} ; do
+        local file_sha1=$(echo "${i}" | awk '{print tolower($0)}')
+        if [ "$script_sha1" = "$file_sha1" ]; then
+        local matched=$file_sha1
+        break
+        fi
+    done
+    echo $matched
 
-NOTHING_TO_BE_DONE_MSG="Nothing to be done."
+}
 
 GETTER ()
 
@@ -100,15 +145,16 @@ GETTER ()
     local BOOT_ROM="${2}"
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
+    local HASH_LIST="${5:-null}" #default HASH_LIST to null if not passed
 
     local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
     
     if [[ "${SYSTEM_FOLDER}" != "" ]]
         then
             echo ""
-            echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER" 
+            echo "STARTING BIOS RETRIEVAL FOR: $SYSTEM_FOLDER" 
             echo ""
-            GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
+            GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}" "$(echo ${HASH_LIST[@]})"
             echo ""
     else
             echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
@@ -125,12 +171,20 @@ GETTER_INTERNAL ()
     local BOOT_ROM="${2}"
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
+    local HASH_LIST=( "$5" )
 
     local GAMES_TARGET="$GAMESDIR/$SYSTEM_FOLDER/$BOOT_ROM"
     if [ -e "$GAMES_TARGET" ]
         then
             echo "${NOTHING_TO_BE_DONE_MSG}"
-            echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info 
+            echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info
+            if [ "$5" != null ]; then #only check hash if passed for system. this is set to null in GETTER if not passed
+                local ISHASHVALID=$(ISSHA1VALID "$(echo ${HASH_LIST[@]})" "$GAMES_TARGET")
+                if [ "$ISHASHVALID" = "false" ]; then
+                    echo "No matching hash for existing bios file. You may want to validate it." 
+                fi
+            fi
+
         else
 
             local ZIP_PATH="$(basename ${ZIP_URL})"
@@ -220,7 +274,8 @@ ITERATE_SYSTEMS ()
             gba)
                 GETTER "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/GBA.zip' \
-                'gba_bios.bin'
+                'gba_bios.bin' \
+                "$(echo ${GBA_BIOS_SHA1_HASHES[@]})"
                 ;;
 
             megacd)
@@ -228,7 +283,7 @@ ITERATE_SYSTEMS ()
                 if [[ "${SYSTEM_FOLDER}" != "" ]]
                     then
                         echo ""
-                        echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER"
+                        echo "STARTING BIOS RETRIEVAL FOR: $SYSTEM_FOLDER"
                         echo ""
                         local BOOT_ROM='boot.rom'
                         local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
@@ -282,7 +337,7 @@ ITERATE_SYSTEMS ()
                         done
 
                                 echo ""
-                                echo "STARTING BIOS RETRIVAL FOR: NEOGEO"
+                                echo "STARTING BIOS RETRIEVAL FOR: NEOGEO"
                                 echo "" 
 
                         if [ -e /tmp/neogeo.bios.file ] 
