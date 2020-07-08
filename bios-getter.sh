@@ -58,14 +58,14 @@ NEOGEO_BIOS=( \
 )
 
 ASTROCADE_BIOS_SHA1_HASHES=( \
-    "D84341FEEC1A0A0E8AA6151B649BC3CF6EF69FBF" `# Bally Computer System 'White' BIOS (1977)(Bally Mfg. Corp.).bin` \
-    "6B2BEF5D970E54ED204549F58BA6D197A8BFD3CC" `# Bally Home Library Computer '3164' BIOS (1977)(Bally Mfg. Corp.).bin` \
-    "B902C941997C9D150A560435BF517C6A28137ECC" `# Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin` \
+    "D84341FEEC1A0A0E8AA6151B649BC3CF6EF69FBF" `#Bally Computer System 'White' BIOS (1977)(Bally Mfg. Corp.).bin` \
+    "6B2BEF5D970E54ED204549F58BA6D197A8BFD3CC" `#Bally Home Library Computer '3164' BIOS (1977)(Bally Mfg. Corp.).bin` \
+    "B902C941997C9D150A560435BF517C6A28137ECC" `#Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin` \
 )
 
 GAMEBOY_BIOS_SHA1_HASHES=( \
-    "4ED31EC6B0B175BB109C0EB5FD3D193DA823339F" `# GB_boot_ROM.gb` \
-    "1293D68BF9643BC4F36954C1E80E38F39864528D" `# GBC_boot_ROM.gb` \
+    "4ED31EC6B0B175BB109C0EB5FD3D193DA823339F" `#GB_boot_ROM.gb` \
+    "1293D68BF9643BC4F36954C1E80E38F39864528D" `#GBC_boot_ROM.gb` \
 )
 
 GBA_BIOS_SHA1_HASHES=( \
@@ -73,16 +73,66 @@ GBA_BIOS_SHA1_HASHES=( \
     "300C20DF6731A33952DED8C436F7F186D25D3492" `#gba_bios.bin` \
 )
 
-MEGACD_BIOS_SHA1_HASHES=()
-#
+MEGACD_BIOS_SHA1_HASHES=(
+    "7063192ae9f6b696c5b81bc8f0a9fe6f0c400e58" `#[BIOS] Mega-CD 2 (Europe) (v2.00).md` \
+    "f5f60f03501908962446ee02fc27d98694dd157d" `#[BIOS] Mega-CD 2 (Europe) (v2.00W).md` \
+    "d203cfe22c03ae479dd8ca33840cf8d9776eb3ff" `#[BIOS] Mega-CD 2 (Japan) (v2.00C).md` \
+    "e4193c6ae44c3cea002707d2a88f1fbcced664de" `#[BIOS] Mega-CD (Asia) (v1.00S).md` \
+    "f891e0ea651e2232af0c5c4cb46a0cae2ee8f356" `#[BIOS] Mega-CD (Europe) (v1.00).md` \
+    "0d5485e67c3f033c41d677cc9936afd6ad618d5f" `#[BIOS] Mega-CD (Japan) (1.00l).md` \
+    "230ebfc49dc9e15422089474bcc9fa040f2c57eb" `#[BIOS] Mega-CD (Japan) (1.00S).md` \
+    "6a40a5cec00c3b49a4fd013505c5580baa733a29" `#[BIOS] Mega-CD (Japan) (v1.00G).md` \
+    "9e1495e62b000e1e1c868c0f3b6982e1abbb8a94" `#[BIOS] Mega-CD (Japan) (v1.00O).md` \
+    "2bd871e53960bc0202c948525c02584399bc2478" `#[BIOS] Mega-CD (Japan) (v1.01).md` \
+    "5a8c4b91d3034c1448aac4b5dc9a6484fce51636" `#[BIOS] Sega CD 2 (USA) (v2.00).md` \
+    "5adb6c3af218c60868e6b723ec47e36bbdf5e6f0" `#[BIOS] Sega CD 2 (USA) (v2.00W).md` \
+    "328a3228c29fba244b9db2055adc1ec4f7a87e6b" `#[BIOS] Sega CD 2 (USA) (v2.11X).md` \
+    "2f397218764502f184f23055055bc5728c71f259" `#[BIOS] Sega CD 68K (Unknown) (Unl).md` \
+    "c5c24e6439a148b7f4c7ea269d09b7a23fe25075" `#[BIOS] Sega CD (USA) (v1.00).md` \
+    "f4f315adcef9b8feb0364c21ab7f0eaf5457f3ed" `#[BIOS] Sega CD (USA) (v1.10).md` \
+    "98bbe341fd60de4e45fc4bed0b47aaabf8707322" `#[BIOS] Sega CD (USA) (v1.10).md` \
+    "98bbe341fd60de4e45fc4bed0b47aaabf8707322" `#EU Mega-CD 1 (Region Free) 921027 l_oliveira.bin` \
+    "27868fb5a8587b4212c96ed36a84a0a8c48569b1" `#EU Mega-CD 2 (Region Free) 930330 l_oliveira.bin` \
+    "d827777ff3a20525bf4b9c103c48d2704adfce99" `#EU Mega-CD 2 (Region Free) 930601 l_oliveira.bin` \
+    "19448fb968629ce3b307f0896471188f99db717c" `#JP Mega-CD 1 PAL (Region Free) 911228 l_oliveira.bin` \
+    "576a09bcfb78cb209d9cccf8573abb2989aafe43" `#JP Mega-CD 1 (Region Free) 911217 l_oliveira.bin` \
+    "d620b4cf258319b4e8de28671c71afe003d39bb1" `#JP Mega-CD 1 (Region Free) 911228 l_oliveira.bin` \
+    "d48a05075ef0f9d146218c8bec7759bd97426bf7" `#JP Mega-CD 2 (Region Free) 921222 l_oliveira.bin` \
+    "219d284dcf63ce366a4dc6d1ff767a0d2eea283d" `#MPR-15768-T.bin` \
+    "0a1910f3f7d9ab284cd0480430322e5edd65e79d" `#US Sega CD 1 (Region Free) 921011 l_oliveira.bin` \
+    "12ecb008f8efebecc9c14f8a6023b4ae12a5e937" `#US Sega CD 2 (Region Free) 930314 l_oliveira.bin` \
+    "9eed922bec1b9ff2b611dacf484d710b732bea5e" `#US Sega CD 2 (Region Free) 930601 l_oliveira.bin` \
+    "c8d4290ff3199bda43acd84ed5067565a8e7666d" `#US Sega CDX (Region Free) 930907 l_oliveira.bin` \
+    "b3f32e409bd5508c89ed8be33d41a58d791d0e5d" `#WONDERMEGA-G303.BIN` \
+)
 
-NEOGEO_BIOS_SHA1_HASHES=()
-#
+NEOGEO_BIOS_SHA1_HASHES=( \
+    "5992277debadeb64d1c1c64b0a92d9293eaf7e4a" `#000-lo.lo` \
+    "neo-epo.sp1-AES_BIOS" `#neo-epo.sp1-AES_BIOS` \
+    "fd4a618cdcdbf849374f0a50dd8efe9dbab706c3" `#sfix.sfix` \
+    "4f5ed7105b7128794654ce82b51723e16e389543" `#sp-s2.sp1-MVS_BIOS` \
+    "938a0bda7d9a357240718c2cec319878d36b8f72" `#uni-bios.rom` \
+)
 
 NES_BIOS_SHA1_HASHES=( \
-    "AF5AF53F66982E749643FDF8B2ACBB7D4D3ED229" `# fds-bios (Beta).rom` \
-    "E4E41472C454F928E53EB10E0509BF7D1146ECC1" `# fds-bios (Twin Famicom).rom` \
-    "57FE1BDEE955BB48D357E463CCBF129496930B62" `# fds-bios.rom` \
+    "AF5AF53F66982E749643FDF8B2ACBB7D4D3ED229" `#fds-bios (Beta).rom` \
+    "E4E41472C454F928E53EB10E0509BF7D1146ECC1" `#fds-bios (Twin Famicom).rom` \
+    "57FE1BDEE955BB48D357E463CCBF129496930B62" `#fds-bios.rom` \
+)
+
+TURBOGRAFX16_BIOS_SHA1_HASHES=( \
+    "ae1275729503851473bfcb1b4a716a70b8b20748" `#[BIOS] CD-ROM System (Japan) (v1.0)_autoboot.pce` \
+    "d1ac6d05e238f0f217248005117f427748a29512" `#[BIOS] CD-ROM System (Japan) (v2.0)_autoboot.pce` \
+    "64e98ff346926a9eea0755f52e9b32fa50a500b6" `#[BIOS] CD-ROM System (Japan) (v2.1)_autoboot.pce` \
+    "a93b99e74945e38b2d74c4dc43bcd221ec1ec705" `#[BIOS] Super CD-ROM System (Japan) (v3.0)_autoboot.pce` \
+    "1837bf25bf4a8e3ef4ec6af36e2e1b8a0e4be9a2" `#[BIOS] TurboGrafx CD Super System Card (USA) (v3.0)_autoboot.pce` \
+    "1dbb9b750d030b658db20e0b434883a8c82cefa5" `#[BIOS] TurboGrafx CD System Card (USA) (v2.0)_autoboot.pce` \
+    "88da02e2503f7c32810f5d93a34849d470742b6d" `#CD-ROM System 2.1.pce` \
+    "a39a66da7de6ba94ab84d04eef7afeec7d4ee66a" `#CD-ROM System v1.0.pce` \
+    "f92ea593c8a935f58f8e1c3b2fc730951ec4fa71" `#CD-ROM System v2.0.pce` \
+    "79f5ff55dd10187c7fd7b8daab0b3ffbd1f56a2c" `#Super CD 3.0.pce` \
+    "d02611d99921986147c753df14c7349b31d71950" `#TGX CD Super System Card 3.0.pce` \
+    "2bea3dac98f84b2f2f469fa77ea720b8770d598d" `#TGX CD System Card 2.0.pce` \
 )
 
 #########Get Script
@@ -145,7 +195,10 @@ GETTER ()
     local BOOT_ROM="${2}"
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
-    local HASH_LIST="${5:-null}" #default HASH_LIST to null if not passed
+    local HASH_LIST=() # default to an emptry array so we can pass it along easier
+    if [  "$#" -gt "4" ]; then # only try to get the arg5 value if there is more than 4 args
+        local HASH_LIST="${5}" 
+    fi
 
     local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
     
@@ -171,17 +224,20 @@ GETTER_INTERNAL ()
     local BOOT_ROM="${2}"
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
-    local HASH_LIST=( "$5" )
+    local HASH_LIST=() # default to an emptry array so we can pass it along easier
+    if [  "$#" -gt "4" ]; then # only try to get the arg5 value if there is more than 4 args
+        local HASH_LIST="${5}" 
+    fi
 
     local GAMES_TARGET="$GAMESDIR/$SYSTEM_FOLDER/$BOOT_ROM"
     if [ -e "$GAMES_TARGET" ]
         then
             echo "${NOTHING_TO_BE_DONE_MSG}"
             echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info
-            if [ "$5" != null ]; then #only check hash if passed for system. this is set to null in GETTER if not passed
+            if [ -n "$HASH_LIST" ]; then #only check hash if passed for system. this is set to empy array in GETTER if not passed
                 local ISHASHVALID=$(ISSHA1VALID "$(echo ${HASH_LIST[@]})" "$GAMES_TARGET")
                 if [ "$ISHASHVALID" = "false" ]; then
-                    echo "No matching hash for existing bios file. You may want to validate it." 
+                    echo "The bios file $GAMES_TARGET doesn't match our known checksums, If you would like this script to update it please remove it and rerun this script else, no action is needed" >> /tmp/bios.info
                 fi
             fi
 
@@ -262,13 +318,15 @@ ITERATE_SYSTEMS ()
             astrocade)
                 GETTER "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Astrocade.zip' \
-                "Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin"
+                "Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin" \
+                "$(echo ${ASTROCADE_BIOS_SHA1_HASHES[@]})"
                 ;;
 
             gameboy)
                 GETTER "${SYSTEM}" 'boot1.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
-                'GBC_boot_ROM.gb'
+                'GBC_boot_ROM.gb' \
+                "$(echo ${GAMEBOY_BIOS_SHA1_HASHES[@]})"
                 ;;
 
             gba)
@@ -303,6 +361,10 @@ ITERATE_SYSTEMS ()
                             echo "${NOTHING_TO_BE_DONE_MSG}"
                             for bios in ${MEGACD_BIOSES[@]} ; do
                                 echo "Skipped '${bios}' because already exists." >> /tmp/bios.info
+                                local ISHASHVALID=$(ISSHA1VALID "$(echo ${MEGACD_BIOS_SHA1_HASHES[@]})" "${bios}")
+                                if [ "$ISHASHVALID" = "false" ]; then
+                                    echo "The bios file ${bios} doesn't match our known checksums, If you would like this script to update it please remove it and rerun this script else, no action is needed" >> /tmp/bios.info
+                                fi
                             done
                         else
                             local MESSAGE=$(GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}")
@@ -333,6 +395,10 @@ ITERATE_SYSTEMS ()
                             while read NEO_BIOS_PATH
                             do
                                 echo "  $NEO_BIOS_PATH" >> /tmp/neogeo.bios.file
+                                local ISHASHVALID=$(ISSHA1VALID "$(echo ${NEOGEO_BIOS_SHA1_HASHES[@]})" "${NEO_BIOS_PATH}")
+                                if [ "$ISHASHVALID" = "false" ]; then
+                                    echo "  The bios file ${NEO_BIOS_PATH} doesn't match our known checksums, If you would like this script to update it please remove it and rerun this script else, no action is needed" >> /tmp/neogeo.bios.file
+                                fi
                             done
                         done
 
@@ -373,14 +439,16 @@ ITERATE_SYSTEMS ()
             nes)
                 GETTER "${SYSTEM}" 'boot0.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
-                'fds-bios.rom'
+                'fds-bios.rom' \
+                "$(echo ${NES_BIOS_SHA1_HASHES[@]})"
                 ;;
 
             turbografx16)
                 mkdir -p "${GAMESDIR}/TGFX16-CD"
                 GETTER 'TGFX16-CD' 'cd_bios.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
-                'Super CD 3.0.pce'
+                'Super CD 3.0.pce' \
+                "$(echo ${TURBOGRAFX16_BIOS_SHA1_HASHES[@]})"
                 ;;
         esac
 
