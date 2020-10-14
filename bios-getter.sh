@@ -17,20 +17,14 @@ set -u
 ######################################################################
 
 BIOSDIR="/media/fat/BIOS"
-GAMESDIR="/media/fat/games"
+INSTALL="false"
+INIFILE="$(pwd)/update_bios-getter.ini"
+
 SSL_SECURITY_OPTION="${SSL_SECURITY_OPTION:---insecure}"
-CURL_RETRY="--connect-timeout 15 --max-time 120 --retry 3 --retry-delay 5 --show-error"
-INIFILE="/media/fat/Scripts/update_bios-getter.ini"
+CURL_RETRY="${CURL_RETRY:---connect-timeout 15 --max-time 180 --retry 3 --retry-delay 5 --show-error}"
+
 EXITSTATUS=0
 
-#########Get Script
-if [ ! -e "/media/fat/Scripts/update_bios-getter.sh" ]
-    then
-        echo "Downloading update_bios-getter.sh to /media/fat/Scripts"
-        echo ""
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "/media/fat/Scripts/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
-        echo
-fi
 
 INIFILE_FIXED=$(mktemp)
 if [[ -f "${INIFILE}" ]] ; then
@@ -41,15 +35,21 @@ fi
 if [ `grep -c "BIOSDIR=" "${INIFILE_FIXED}"` -gt 0 ]
     then
         BIOSDIR=`grep "BIOSDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
-fi 2>/dev/null 
+fi 2>/dev/null
 
-if [ `grep -c "GAMESDIR=" "${INIFILE_FIXED}"` -gt 0 ]
-    then
-        GAMESDIR=`grep "GAMESDIR=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
-fi 2>/dev/null 
+if [ `grep -c "INSTALL=" "${INIFILE_FIXED}"` -gt 0 ]
+   then
+      INSTALL=`grep "INSTALL=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^ *"//' -e 's/" *$//'`
+fi 2>/dev/null
+
+if [ `grep -c "CURL_RETRY=" "${INIFILE_FIXED}"` -gt 0 ]
+   then
+      CURL_RETRY=`grep "CURL_RETRY=" "${INIFILE_FIXED}" | awk -F "=" '{print$2}' | sed -e 's/^ *//' -e 's/ *$//' -e 's/^"//' -e 's/"$//'`
+fi 2>/dev/null
+
 #####INFO TXT#####
 
-if [ `egrep -c "BIOSDIR|GAMESDIR" "${INIFILE_FIXED}"` -gt 0 ]
+if [ `egrep -c "BIOSDIR|INSTALL|CURL_RETRY" "${INIFILE_FIXED}"` -gt 0 ]
     then
         echo ""
         echo "Using "${INIFILE}"" 
@@ -57,6 +57,16 @@ if [ `egrep -c "BIOSDIR|GAMESDIR" "${INIFILE_FIXED}"` -gt 0 ]
 fi 2>/dev/null 
 
 rm ${INIFILE_FIXED}
+
+#########Auto Install##########
+if [[ "${INSTALL^^}" == "TRUE" ]] && [ ! -e "/media/fat/Scripts/update_bios-getter.sh" ]
+   then
+        echo "Downloading update_bios-getter.sh to /media/fat/Scripts"
+        echo ""
+        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --location -o "/media/fat/Scripts/update_bios-getter.sh" https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/update_bios-getter.sh
+        echo
+fi
+
 
 SYSTEMS_WITH_BIOS=( \
     Astrocade \
@@ -66,6 +76,25 @@ SYSTEMS_WITH_BIOS=( \
     NeoGeo \
     NES \
     TurboGrafx16 \
+)
+
+FIND_FOLDERS=( \
+    /media/fat \
+    /media/usb0 \
+    /media/usb1 \
+    /media/usb2 \
+    /media/usb3 \
+    /media/usb4 \
+    /media/usb5 \
+    /media/usb0/games \
+    /media/usb1/games \
+    /media/usb2/games \
+    /media/usb3/games \
+    /media/usb4/games \
+    /media/usb5/games \
+    /media/fat/cifs \
+    /media/fat/cifs/games \
+    /media/fat/games \
 )
 
 NEOGEO_BIOS=( \
@@ -101,7 +130,8 @@ GETTER ()
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
 
-    local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
+    GET_SYSTEM_FOLDER "${SYSTEM}"
+    local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
     
     if [[ "${SYSTEM_FOLDER}" != "" ]]
         then
@@ -111,7 +141,7 @@ GETTER ()
             GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
             echo ""
     else
-            echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+            echo "Please create a "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
     fi	
             echo ""
             echo "##################################################################"
@@ -126,7 +156,7 @@ GETTER_INTERNAL ()
     local ZIP_URL="${3}"
     local BIOS_ROM="${4}"
 
-    local GAMES_TARGET="$GAMESDIR/$SYSTEM_FOLDER/$BOOT_ROM"
+    local GAMES_TARGET="$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM_FOLDER/$BOOT_ROM"
     if [ -e "$GAMES_TARGET" ]
         then
             echo "${NOTHING_TO_BE_DONE_MSG}"
@@ -152,12 +182,22 @@ GETTER_INTERNAL ()
     fi
 }
 
-
+GET_SYSTEM_FOLDER_GAMESDIR=
+GET_SYSTEM_FOLDER_RESULT=
 GET_SYSTEM_FOLDER()
-
 {
+    GET_SYSTEM_FOLDER_GAMESDIR="/media/fat/games"
+    GET_SYSTEM_FOLDER_RESULT=
     local SYSTEM="${1}"
-    find "${GAMESDIR}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit
+    for folder in ${FIND_FOLDERS[@]}
+    do
+        local RESULT=$(find "${folder}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit 2> /dev/null)
+        if [[ "${RESULT}" != "" ]] ; then
+            GET_SYSTEM_FOLDER_GAMESDIR="${folder}"
+            GET_SYSTEM_FOLDER_RESULT="${RESULT}"
+            break
+        fi
+    done
 }
 
 
@@ -180,11 +220,11 @@ INSTALL_MEGACD_REGION ()
     local BIOS_SOURCE="${2}"
     local REGION="${3}"
 
-    local GAMES_TARGET="${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}/cd_bios.rom"
+    local GAMES_TARGET="${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${REGION}/cd_bios.rom"
     if [ -f "${GAMES_TARGET}" ] ; then
         echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info
     elif [ -f "${BIOS_SOURCE}" ] ; then
-        mkdir -p "${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}"
+        mkdir -p "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${REGION}"
         INSTALL "${BIOS_SOURCE}" "${GAMES_TARGET}" "${SYSTEM_FOLDER}"
     fi
 }
@@ -224,7 +264,8 @@ ITERATE_SYSTEMS ()
                 ;;
 
             megacd)
-                local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
+                GET_SYSTEM_FOLDER "${SYSTEM}"
+                local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
                 if [[ "${SYSTEM_FOLDER}" != "" ]]
                     then
                         echo ""
@@ -234,10 +275,10 @@ ITERATE_SYSTEMS ()
                         local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
                         local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
                         local MEGACD_BIOSES=(
-                            "${GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}"
-                            "${GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom"
-                            "${GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom"
-                            "${GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom"
+                            "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}"
+                            "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom"
+                            "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom"
+                            "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom"
                         )
                         local ALL_TRUE="true"
                         for bios in ${MEGACD_BIOSES[@]} ; do
@@ -260,21 +301,22 @@ ITERATE_SYSTEMS ()
                         fi
                         echo
                 else
-                        echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+                        echo "Please create a "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
                 fi
                         echo ""
                         echo "##################################################################"
                 ;;
 
             neogeo)
-                local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
-                
+                GET_SYSTEM_FOLDER "${SYSTEM}"
+                local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
+
                 if [[ "${SYSTEM_FOLDER}" != "" ]]
                     then
                         rm /tmp/neogeo.bios.file 2> /dev/null
                         for NEO_BIOS_REGEX in ${NEOGEO_BIOS[@]}
                         do
-                            find "$GAMESDIR/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "$GAMESDIR/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
+                            find "$GET_SYSTEM_FOLDER_GAMESDIR/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "$GET_SYSTEM_FOLDER_GAMESDIR/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
                             while read NEO_BIOS_PATH
                             do
                                 echo "  $NEO_BIOS_PATH" >> /tmp/neogeo.bios.file
@@ -304,12 +346,12 @@ ITERATE_SYSTEMS ()
                                         rm "$BIOSDIR/uni-bios-40.zip"
                                 fi
 
-                                INSTALL "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
-                                INSTALL "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
+                                INSTALL "$BIOSDIR/NeoGeo/sfix.sfix" "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
+                                INSTALL "$BIOSDIR/NeoGeo/uni-bios.rom" "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
                         fi
                         echo
                     else
-                                echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+                                echo "Please create a "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
                 fi
                                 echo ""
                                 echo "##################################################################"
@@ -322,7 +364,7 @@ ITERATE_SYSTEMS ()
                 ;;
 
             turbografx16)
-                mkdir -p "${GAMESDIR}/TGFX16-CD"
+                mkdir -p "${GET_SYSTEM_FOLDER_GAMESDIR}/TGFX16-CD"
                 GETTER 'TGFX16-CD' 'cd_bios.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
                 'Super CD 3.0.pce'

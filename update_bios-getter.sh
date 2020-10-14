@@ -46,23 +46,62 @@
 
 #USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTY AND MAY KILL BABY SEALS.
 
+echo "STARTING BIOS-GETTER"
+echo ""
+# ========= OPTIONS ==================
+ALLOW_INSECURE_SSL="true"
+CURL_RETRY="--connect-timeout 15 --max-time 180 --retry 3 --retry-delay 5 --show-error"
+# ========= CODE STARTS HERE =========
+
+INI_PATH="$(pwd)/update_bios-getter.ini"
+if [ -f "${INI_PATH}" ] ; then
+    TMP=$(mktemp)
+    dos2unix < "${INI_PATH}" 2> /dev/null | grep -v "^exit" > ${TMP} || true
+
+    if [ $(grep -c "ALLOW_INSECURE_SSL=" "${TMP}") -gt 0 ] ; then
+        ALLOW_INSECURE_SSL=$(grep "ALLOW_INSECURE_SSL=" "${TMP}" | awk -F "=" '{print$2}' | sed -e 's/^ *// ; s/ *$// ; s/^"// ; s/"$//')
+    fi 2> /dev/null
+
+    if [ $(grep -c "CURL_RETRY=" "${TMP}") -gt 0 ] ; then
+        CURL_RETRY=$(grep "CURL_RETRY=" "${TMP}" | awk -F "=" '{print$2}' | sed -e 's/^ *// ; s/ *$// ; s/^"// ; s/"$//')
+    fi 2> /dev/null
+
+    rm ${TMP}
+fi
+
 #####################################################################################################
 SSL_SECURITY_OPTION=""
+
+set +e
 curl ${CURL_RETRY} "https://github.com" > /dev/null 2>&1
-case $? in
-    0) ;;
-    60) SSL_SECURITY_OPTION="--insecure" ;;
+RET_CURL=$?
+set -e
+
+case ${RET_CURL} in
+    0)
+        ;;
+    *)
+        if [[ "${ALLOW_INSECURE_SSL}" == "true" ]]
+        then
+            SSL_SECURITY_OPTION="--insecure"
+        else
+            echo "CA certificates need"
+            echo "to be fixed for"
+            echo "using SSL certificate"
+            echo "verification."
+            echo "Please fix them i.e."
+            echo "using security_fixes.sh"
+            exit 2
+        fi
+        ;;
     *)
         echo "No Internet connection"
         exit 1
         ;;
 esac
-export SSL_SECURITY_OPTION
 
 BIOS_GETTER="bios-getter.sh"
 URL="https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/"
-echo "STARTING CONSOLE-BIOS-GETTER"
-echo ""
 echo "Downloading the most recent ${BIOS_GETTER} script."
 echo ""
 
@@ -76,9 +115,13 @@ curl \
     ${SSL_SECURITY_OPTION} \
     --output /tmp/${BIOS_GETTER} \
     ${URL}${BIOS_GETTER}
-    
+
+export CURL_RETRY
+export ALLOW_INSECURE_SSL
+export SSL_SECURITY_OPTION
+
 bash /tmp/${BIOS_GETTER} && rm /tmp/${BIOS_GETTER}
 
-echo "FINISHED: CONSOLE-BIOS-GETTER"
+echo "FINISHED: BIOS-GETTER"
 
 exit 0
