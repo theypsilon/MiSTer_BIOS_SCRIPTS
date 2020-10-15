@@ -1,17 +1,19 @@
 # MiSTer_BIOS_Scripts 
 Simple scripts to automate downloading BIOS files for MiSTer console cores.
 
-Instructions
+### Instructions
 
-Download the update_bios-getter.sh to the Scripts directory and run:
+Download the <a id="raw-url" href="https://raw.githubusercontent.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/master/update_bios-getter.sh">update_bios-getter.sh</a> to the Scripts directory and run:
 
-update_bios-getter.sh
+    update_bios-getter.sh
+
+These scripts look at what RBFconsole core files you have and downloads the bios needed for them.
 
 This script DOES NOT download any cores. 
 
-Q:Will this script over write files I already have?
+Q:Will this script overwrite any files I already have?
 
-A: NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files BIOS files for the core.
+A: NO. This script will not clobber any files you already have. You need to manually remove any BIOS files you have if you want to download new BIOS files for the core.
 
 Q: Where are the Downloaded BIOS files located?
 
@@ -21,11 +23,11 @@ Q: Can I set a custom BIOS directory location?
 
 A: Yes, in the update_bios-getter.ini: BIOSDIR=/path/to/your/location
 
-#Q: Can I set this to work with usb drives?
+Q: Can I set this to work with usb drives?
 
-#A: yes, in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
+A: Yes, in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
 
-The bios-getter willdownload many bios files to /media/fat/BIOS however, we have chosen some sane defaults to be copyed to the /games/<console> directory. These defaults are:
+The bios-getter will download many bios files to /media/fat/BIOS. However, we have chosen some sane defaults to be copied to the /games/<console> directory. These defaults are:
   
   Astrocade
   ```

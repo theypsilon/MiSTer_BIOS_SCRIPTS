@@ -26,9 +26,9 @@
 
 #These scripts DO NOT download any cores.
 
-#Q:Will this script over write files I already have?
+#Q:Will this script over write any files I already have?
 
-#A: NO, This script will not clober files you already have. You need to manaully remove any files you have if you want to download new files BIOS files for the core.
+#A: NO. This script will not clobber files you already have. You need to manaully remove any BIOS files you have if you want to download new files BIOS files for the core.
 
 #Q: Where are the Downloaded BIOS files located?
 
@@ -40,11 +40,11 @@
 
 #Q: Can I set this to work with usb drives?
 
-#A: yes,in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
+#A: Yes, in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
 
 #You should back up your bios files before running this script.
 
-#USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTE AND MAY KILL BABY SEALS.
+#USE AT YOUR OWN RISK - THIS COMES WITHOUT WARRANTY AND MAY KILL BABY SEALS.
 
 #####################################################################################################
 SSL_SECURITY_OPTION=""
