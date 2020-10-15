@@ -189,6 +189,19 @@ INSTALL_MEGACD_REGION ()
     fi
 }
 
+INSTALL_BSX_REGION() {
+    local SYSTEM_FOLDER="${1}"
+    local BIOS_SOURCE="${2}"
+    local REGION="${3}"
+
+    local GAMES_TARGET="${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}/BSX_bios.rom"
+    if [ -f "${GAMES_TARGET}" ]; then
+        echo "Skipped '$GAMES_TARGET' because already exists." >>/tmp/bios.info
+    elif [ -f "${BIOS_SOURCE}" ]; then
+        mkdir -p "${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}"
+        INSTALL "${BIOS_SOURCE}" "${GAMES_TARGET}" "${SYSTEM_FOLDER}"
+    fi
+}
 
 ITERATE_SYSTEMS ()
 
@@ -319,6 +332,47 @@ ITERATE_SYSTEMS ()
                 GETTER "${SYSTEM}" 'boot0.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
                 'fds-bios.rom'
+                ;;
+
+            snes)
+                local SYSTEM_FOLDER=$(GET_SYSTEM_FOLDER "${SYSTEM}")
+                if [[ "${SYSTEM_FOLDER}" != "" ]]; then
+                    echo ""
+                    echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER"
+                    echo ""
+                    local BOOT_ROM='bsx_bios.rom'
+                    local ZIP_URL='https://archive.org/download/bsx-bios/BSX_BIOS.zip'
+                    local BIOS_ROM='BS-X BIOS (English) [No DRM] [2016 v1.3].sfc'
+                    local BSX_BIOSES=(
+                        "${GAMESDIR}/${SYSTEM_FOLDER}/BSX/${BOOT_ROM}"
+                        "${GAMESDIR}/${SYSTEM_FOLDER}/BSX/Japan/bsx_bios.rom"
+                        "${GAMESDIR}/${SYSTEM_FOLDER}/BSX/JapanNoDRM/bsx_bios.rom"
+                        "${GAMESDIR}/${SYSTEM_FOLDER}/BSX/English/bsx_bios.rom"
+                    )
+                    local ALL_TRUE="true"
+                    for bios in ${BSX_BIOSES[@]}; do
+                        [ -e "${bios}" ] || ALL_TRUE="false"
+                    done
+                    if [[ "${ALL_TRUE}" == "true" ]]; then
+                        echo "${NOTHING_TO_BE_DONE_MSG}"
+                        for bios in ${BSX_BIOSES[@]}; do
+                            echo "Skipped '${bios}' because already exists." >>/tmp/bios.info
+                        done
+                    else
+                        local MESSAGE=$(GETTER_INTERNAL "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}")
+                        if [[ "${MESSAGE}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+                            echo "${MESSAGE}"
+                        fi
+                        INSTALL_BSX_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/BSX/Japan/BS-X - Sore wa Namae o Nusumareta Machi no Monogatari (Japan) (Rev 1).sfc" "Japan"
+                        INSTALL_BSX_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/BSX/JapanNoDRM/BS-X BIOS (Japan) [No DRM].sfc" "JapanNoDRM"
+                        INSTALL_BSX_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/BSX/English/BS-X BIOS (English) [With DRM] [2016 v1.3].sfc" "English"
+                    fi
+                    echo
+                else
+                    echo "Please create a "$GAMESDIR/$SYSTEM" directory" >>/tmp/dir.errors
+                fi
+                echo ""
+                echo "##################################################################"
                 ;;
 
             turbografx16)
