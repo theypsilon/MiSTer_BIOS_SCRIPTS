@@ -3,7 +3,7 @@ Simple scripts to automate downloading BIOS files for MiSTer console cores.
 
 ### Instructions
 
-Download the <a id="raw-url" href="https://raw.githubusercontent.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/master/update_bios-getter.sh">update_bios-getter.sh</a> to the Scripts directory and run:
+Download the <a id="raw-url" href="https://raw.githubusercontent.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/master/update_bios-getter.sh" download>update_bios-getter.sh</a> to the Scripts directory and run:
 
     update_bios-getter.sh
 
