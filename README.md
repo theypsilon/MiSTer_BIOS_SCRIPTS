@@ -1,9 +1,9 @@
 # MiSTer_BIOS_Scripts 
 Simple scripts to automate downloading BIOS files for MiSTer console cores.
 
-### Instructions
+## Instructions
 
-Download the <a id="raw-url" href="https://raw.githubusercontent.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/master/update_bios-getter.sh" download>update_bios-getter.sh</a> to the Scripts directory and run:
+Download the <a id="raw-url" href="https://raw.githubusercontent.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/master/update_bios-getter.sh" download target="_blank">update_bios-getter.sh</a> to the Scripts directory and run:
 
     update_bios-getter.sh
 
@@ -11,21 +11,23 @@ These scripts look at what RBFconsole core files you have and downloads the bios
 
 This script DOES NOT download any cores. 
 
-Q:Will this script overwrite any files I already have?
+### FAQ
 
-A: NO. This script will not clobber any files you already have. You need to manually remove any BIOS files you have if you want to download new BIOS files for the core.
+**Q:** Will this script overwrite any files I already have?
 
-Q: Where are the Downloaded BIOS files located?
+**A:** NO. This script will not clobber any files you already have. You need to manually remove any BIOS files you have if you want to download new BIOS files for the core.
 
-A: This script downloads all bios files to /media/fat/BIOS.
+**Q:** Where are the Downloaded BIOS files located?
 
-Q: Can I set a custom BIOS directory location?
+**A:** This script downloads all bios files to /media/fat/BIOS.
 
-A: Yes, in the update_bios-getter.ini: BIOSDIR=/path/to/your/location
+**Q:** Can I set a custom BIOS directory location?
 
-Q: Can I set this to work with usb drives?
+**A:** Yes, in the update_bios-getter.ini: BIOSDIR=/path/to/your/location
 
-A: Yes, in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
+**Q:** Can I set this to work with usb drives?
+
+**A:** Yes, in the update_bios-getter.ini: GAMESDIR=/media/usb0/games
 
 The bios-getter will download many bios files to /media/fat/BIOS. However, we have chosen some sane defaults to be copied to the /games/<console> directory. These defaults are:
   
