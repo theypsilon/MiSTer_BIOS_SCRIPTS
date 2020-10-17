@@ -165,7 +165,7 @@ ITERATE_SYSTEMS()
                 ;;
 
             neogeo)
-                GETTER_INSTALL_NEOGEO "${SYSTEM}"
+                GETTER_DO INSTALL_NEOGEO "${SYSTEM}"
                 ;;
 
             nes)
@@ -233,7 +233,6 @@ INSTALL_SINGLE_ROM()
             echo "${NOTHING_TO_BE_DONE_MSG}"
             echo "Skipped '${GAMESDIR_TARGET_FILE}' because already exists." >> /tmp/bios.info
         else
-            echo "Downloading: ${SOURCE_FILE_URL}"
             if [[ "${SOURCE_FILE_URL^^}" =~ \.ZIP$ ]] ; then
                 FETCH_FILE_ZIP "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}" "${SOURCE_UNZIPPED_ROM_NAME}"
             else
@@ -316,54 +315,39 @@ COPY_MEGACD_REGION()
     fi
 }
 
-GETTER_INSTALL_NEOGEO()
+INSTALL_NEOGEO()
 {
-    local SYSTEM="${1}"
-    GET_SYSTEM_FOLDER "${SYSTEM}"
-    local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
-    local GAMESDIR="${GET_SYSTEM_FOLDER_GAMESDIR}"
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
 
-    if [[ "${SYSTEM_FOLDER}" != "" ]]
+    rm /tmp/neogeo.bios.file 2> /dev/null
+    for NEO_BIOS_REGEX in ${NEOGEO_BIOS[@]}
+    do
+        find "${GAMESDIR}/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "${GAMESDIR}/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
+        while read NEO_BIOS_PATH
+        do
+            echo "  ${NEO_BIOS_PATH}" >> /tmp/neogeo.bios.file
+        done
+    done
+
+    if [ -e /tmp/neogeo.bios.file ]
         then
-            rm /tmp/neogeo.bios.file 2> /dev/null
-            for NEO_BIOS_REGEX in ${NEOGEO_BIOS[@]}
-            do
-                find "$GAMESDIR/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "$GAMESDIR/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
-                while read NEO_BIOS_PATH
-                do
-                    echo "  $NEO_BIOS_PATH" >> /tmp/neogeo.bios.file
-                done
-            done
-
-                    echo ""
-                    echo "STARTING BIOS RETRIVAL FOR: NEOGEO"
-                    echo "" 
-
-            if [ -e /tmp/neogeo.bios.file ] 
-                then
-                    echo "${NOTHING_TO_BE_DONE_MSG}"
-                    echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.info
-                    cat /tmp/neogeo.bios.file >> /tmp/bios.info
-                else
-                    local BOOT_ROM='000-lo.lo'
-                    local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
-                    local BIOS_ROM='000-lo.lo'
-                    INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
-
-                    if [ ! -f "$BIOSDIR/NeoGeo/sfix.sfix" ] || [ ! -f "$BIOSDIR/NeoGeo/uni-bios.rom" ]
-                        then
-                            DOWNLOAD_ZIP "http://unibios.free.fr/download/uni-bios-40.zip" "$BIOSDIR/uni-bios-40.zip" "$BIOSDIR/NeoGeo"
-                    fi
-
-                    COPY_BIOS_TO_GAMESDIR "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
-                    COPY_BIOS_TO_GAMESDIR "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
-            fi
-            echo
+            echo "${NOTHING_TO_BE_DONE_MSG}"
+            echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.info
+            cat /tmp/neogeo.bios.file >> /tmp/bios.info
         else
-                    echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+            if [ ! -f "${BIOSDIR}/NeoGeo/uni-bios.rom" ]
+                then
+                    DOWNLOAD_ZIP "http://unibios.free.fr/download/uni-bios-40.zip" "${BIOSDIR}/uni-bios-40.zip" "${BIOSDIR}/NeoGeo"
+                    echo
+            fi
+
+            INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" '000-lo.lo' 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip' '000-lo.lo'
+
+            COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/sfix.sfix" "${GAMESDIR}/${SYSTEM_FOLDER}/sfix.sfix" "${SYSTEM_FOLDER}"
+            COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/uni-bios.rom" "${GAMESDIR}/${SYSTEM_FOLDER}/uni-bios.rom" "${SYSTEM_FOLDER}"
     fi
-                    echo ""
-                    echo "##################################################################"
+    echo
 }
 
 FETCH_FILE_RESULT_BIOS_SOURCE_FILE=
@@ -377,7 +361,7 @@ FETCH_FILE_NORMAL()
 
     if [ ! -f "${BIOS_SOURCE_FILE}" ] ; then
         mkdir -vp "$(dirname ${BIOS_SOURCE_FILE})"
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} -s --fail --location -o "${BIOS_SOURCE_FILE}" "${SOURCE_FILE_URL}"
+        DOWNLOAD_FILE "${SOURCE_FILE_URL}" "${BIOS_SOURCE_FILE}"
     fi
     FETCH_FILE_RESULT_BIOS_SOURCE_FILE="${BIOS_SOURCE_FILE}"
 }
@@ -404,9 +388,17 @@ DOWNLOAD_ZIP()
     local SOURCE_FILE_URL="${1}"
     local CURL_OUTPUT_PATH="${2}"
     local BIOS_SOURCE_DIR="${3}"
-    curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} -s --fail --location -o "${CURL_OUTPUT_PATH}" "${SOURCE_FILE_URL}"
+    DOWNLOAD_FILE "${SOURCE_FILE_URL}" "${CURL_OUTPUT_PATH}"
     unzip -o -j "${CURL_OUTPUT_PATH}" -d "${BIOS_SOURCE_DIR}/"
     rm "${CURL_OUTPUT_PATH}" 2> /dev/null
+}
+
+DOWNLOAD_FILE()
+{
+    local SOURCE_FILE_URL="${1}"
+    local CURL_OUTPUT_PATH="${2}"
+    echo "Downloading ${SOURCE_FILE_URL}"
+    curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} -s --fail --location -o "${CURL_OUTPUT_PATH}" "${SOURCE_FILE_URL}" > /dev/null
 }
 
 
@@ -445,7 +437,7 @@ rm -v /tmp/bios.errors 2> /dev/null
 rm -v /tmp/bios.info 2> /dev/null
 rm -v /tmp/dir.errors 2> /dev/null
 
-mkdir -p "$BIOSDIR"
+mkdir -p "${BIOSDIR}"
 
 ITERATE_SYSTEMS
 
