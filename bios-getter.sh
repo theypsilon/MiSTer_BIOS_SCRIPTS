@@ -165,7 +165,7 @@ ITERATE_SYSTEMS()
                 ;;
 
             neogeo)
-                GETTER_NEOGEO "${SYSTEM}"
+                GETTER_INSTALL_NEOGEO "${SYSTEM}"
                 ;;
 
             nes)
@@ -316,7 +316,7 @@ COPY_MEGACD_REGION()
     fi
 }
 
-GETTER_NEOGEO()
+GETTER_INSTALL_NEOGEO()
 {
     local SYSTEM="${1}"
     GET_SYSTEM_FOLDER "${SYSTEM}"
