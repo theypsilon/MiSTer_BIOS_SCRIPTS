@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 #set -x
 set -u
 
@@ -124,8 +124,7 @@ NEOGEO_BIOS=( \
 NOTHING_TO_BE_DONE_MSG="Nothing to be done."
 
 
-ITERATE_SYSTEMS ()
-
+ITERATE_SYSTEMS()
 {
     echo ""
     echo "Systems checked:"
@@ -140,29 +139,29 @@ ITERATE_SYSTEMS ()
         
         case "${LOWERCASE_SYSTEM}" in
             ao486)
-                #GETTER_AO486 "${SYSTEM}"
+                GETTER_DO INSTALL_AO486 "${SYSTEM}"
                 ;;
 
             astrocade)
-                GETTER_DEFAULT "${SYSTEM}" 'boot.rom' \
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Astrocade.zip' \
                 "Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin"
                 ;;
 
             gameboy)
-                GETTER_DEFAULT "${SYSTEM}" 'boot1.rom' \
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot1.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
                 'GBC_boot_ROM.gb'
                 ;;
 
             gba)
-                GETTER_DEFAULT "${SYSTEM}" 'boot.rom' \
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/GBA.zip' \
                 'gba_bios.bin'
                 ;;
 
             megacd)
-                GETTER_MEGACD "${SYSTEM}"
+                GETTER_DO INSTALL_MEGACD "${SYSTEM}"
                 ;;
 
             neogeo)
@@ -170,7 +169,7 @@ ITERATE_SYSTEMS ()
                 ;;
 
             nes)
-                GETTER_DEFAULT "${SYSTEM}" 'boot0.rom' \
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot0.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
                 'fds-bios.rom'
                 ;;
@@ -184,7 +183,7 @@ ITERATE_SYSTEMS ()
                         mkdir -p "${GET_SYSTEM_FOLDER_GAMESDIR}/${GAMESDIR_CD_FOLDER_NAME}"
                     fi
                 fi
-                GETTER_DEFAULT "${GAMESDIR_CD_FOLDER_NAME}" 'cd_bios.rom' \
+                GETTER_DO INSTALL_SINGLE_ROM "${GAMESDIR_CD_FOLDER_NAME}" 'cd_bios.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
                 'Super CD 3.0.pce'
                 ;;
@@ -193,106 +192,128 @@ ITERATE_SYSTEMS ()
     done 
 }
 
-GETTER_DEFAULT ()
+GETTER_DO()
 {
-    local SYSTEM="${1}"
-    local TARGET_ROM_NAME="${2}"
-    local SOURCE_FILE_URL="${3}"
-    local SOURCE_UNZIPPED_ROM_NAME="${4}"
-
-    GETTER_SYSTEM_CHECK "${SYSTEM}" INSTALL_SINGLE_ROM "${TARGET_ROM_NAME}" "${SOURCE_FILE_URL}" "${SOURCE_UNZIPPED_ROM_NAME}"
-}
-
-GETTER_SYSTEM_CHECK()
-{
-    local SYSTEM="${1}"
-    local CALLBACK="${2}"
+    local CALLBACK="${1}"
+    local SYSTEM="${2}"
 
     shift
     shift
 
     GET_SYSTEM_FOLDER "${SYSTEM}"
     local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
+    local GAMESDIR="${GET_SYSTEM_FOLDER_GAMESDIR}"
 
     if [[ "${SYSTEM_FOLDER}" != "" ]]
         then
             echo ""
             echo "STARTING BIOS RETRIVAL FOR: ${SYSTEM_FOLDER}" 
             echo ""
-            echo ${CALLBACK} "${SYSTEM_FOLDER}" "${@}"
+            ${CALLBACK} "${SYSTEM_FOLDER}" "${GAMESDIR}" "${@}"
             echo ""
     else
-            echo "Please create a "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM}" directory" >> /tmp/dir.errors
+            echo "Please create a "${GAMESDIR}/${SYSTEM}" directory" >> /tmp/dir.errors
     fi	
             echo ""
             echo "##################################################################"
-    exit 0
 }
 
-GETTER_AO486()
+INSTALL_SINGLE_ROM()
 {
-    local SYSTEM="${1}"
-    GET_SYSTEM_FOLDER "${SYSTEM}"
-    local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
-    if [[ "${SYSTEM_FOLDER}" != "" ]]
-        then
-            echo ""
-            echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER"
-            echo ""
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+    local TARGET_ROM_NAME="${3}"
+    local SOURCE_FILE_URL="${4}"
+    local SOURCE_UNZIPPED_ROM_NAME="${5}"
 
-            INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "boot0.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot0.rom" ""
-            INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "boot1.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot1.rom" ""
-    else
-            echo "Please create a "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM}" directory" >> /tmp/dir.errors
-    fi
-            echo ""
-            echo "##################################################################"   
-}
+    local GAMESDIR_TARGET_FILE="${GAMESDIR}/${SYSTEM_FOLDER}/${TARGET_ROM_NAME}"
 
-GETTER_MEGACD()
-{
-    local SYSTEM="${1}"
-    GET_SYSTEM_FOLDER "${SYSTEM}"
-    local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
-    if [[ "${SYSTEM_FOLDER}" != "" ]]
+    if [ -e "${GAMESDIR_TARGET_FILE}" ]
         then
-            echo ""
-            echo "STARTING BIOS RETRIVAL FOR: $SYSTEM_FOLDER"
-            echo ""
-            local BOOT_ROM='boot.rom'
-            local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
-            local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
-            local MEGACD_BIOSES=(
-                "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}"
-                "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom"
-                "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom"
-                "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom"
-            )
-            local ALL_TRUE="true"
-            for bios in ${MEGACD_BIOSES[@]} ; do
-                [ -e "${bios}" ] || ALL_TRUE="false"
-            done
-            if [[ "${ALL_TRUE}" == "true" ]]
-            then
-                echo "${NOTHING_TO_BE_DONE_MSG}"
-                for bios in ${MEGACD_BIOSES[@]} ; do
-                    echo "Skipped '${bios}' because already exists." >> /tmp/bios.info
-                done
+            echo "${NOTHING_TO_BE_DONE_MSG}"
+            echo "Skipped '${GAMESDIR_TARGET_FILE}' because already exists." >> /tmp/bios.info
+        else
+            echo "Downloading: ${SOURCE_FILE_URL}"
+            if [[ "${SOURCE_FILE_URL^^}" =~ \.ZIP$ ]] ; then
+                FETCH_FILE_ZIP "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}" "${SOURCE_UNZIPPED_ROM_NAME}"
             else
-                local MESSAGE=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}")
-                if [[ "${MESSAGE}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
-                    echo "${MESSAGE}"
-                fi
-                INSTALL_MEGACD_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/MegaCD/[BIOS] Mega-CD 2 (Japan) (v2.00C).md" "Japan"
-                INSTALL_MEGACD_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/MegaCD/[BIOS] Sega CD 2 (USA) (v2.00).md" "USA"
-                INSTALL_MEGACD_REGION "${SYSTEM_FOLDER}" "${BIOSDIR}/MegaCD/[BIOS] Mega-CD 2 (Europe) (v2.00).md" "Europe"
+                FETCH_FILE_NORMAL "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}"
             fi
             echo
-    else
-            echo "Please create a "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+            COPY_BIOS_TO_GAMESDIR "${FETCH_FILE_RESULT_BIOS_SOURCE_FILE}" "${GAMESDIR_TARGET_FILE}" "${SYSTEM_FOLDER}"
     fi
-            echo ""
-            echo "##################################################################"
+}
+
+INSTALL_AO486()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+
+    local INSTALL_1=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot0.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot0.rom" "")
+    if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        echo "${INSTALL_1}"
+    fi
+
+    echo
+    local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot1.rom" "")
+    if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        echo "${INSTALL_2}"
+    fi
+
+    if [[ "${INSTALL_1}" == "${NOTHING_TO_BE_DONE_MSG}" ]] && [[ "${INSTALL_2}" == "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
+    fi
+}
+
+INSTALL_MEGACD()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+
+    local BOOT_ROM='boot.rom'
+    local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
+    local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
+    local MEGACD_BIOSES=(
+        "${GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}"
+        "${GAMESDIR}/${SYSTEM_FOLDER}/Japan/cd_bios.rom"
+        "${GAMESDIR}/${SYSTEM_FOLDER}/USA/cd_bios.rom"
+        "${GAMESDIR}/${SYSTEM_FOLDER}/Europe/cd_bios.rom"
+    )
+    local ALL_TRUE="true"
+    for bios in ${MEGACD_BIOSES[@]} ; do
+        [ -e "${bios}" ] || ALL_TRUE="false"
+    done
+    if [[ "${ALL_TRUE}" == "true" ]]
+    then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
+        for bios in ${MEGACD_BIOSES[@]} ; do
+            echo "Skipped '${bios}' because already exists." >> /tmp/bios.info
+        done
+    else
+        local MESSAGE=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}")
+        if [[ "${MESSAGE}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+            echo "${MESSAGE}"
+        fi
+        COPY_MEGACD_REGION "${SYSTEM_FOLDER}" "${GAMESDIR}" "${BIOSDIR}/MegaCD/[BIOS] Mega-CD 2 (Japan) (v2.00C).md" "Japan"
+        COPY_MEGACD_REGION "${SYSTEM_FOLDER}" "${GAMESDIR}" "${BIOSDIR}/MegaCD/[BIOS] Sega CD 2 (USA) (v2.00).md" "USA"
+        COPY_MEGACD_REGION "${SYSTEM_FOLDER}" "${GAMESDIR}" "${BIOSDIR}/MegaCD/[BIOS] Mega-CD 2 (Europe) (v2.00).md" "Europe"
+    fi
+}
+
+COPY_MEGACD_REGION()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+    local BIOS_SOURCE="${3}"
+    local REGION="${4}"
+
+    local GAMES_TARGET="${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}/cd_bios.rom"
+    if [ -f "${GAMES_TARGET}" ] ; then
+        echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info
+    elif [ -f "${BIOS_SOURCE}" ] ; then
+        mkdir -p "${GAMESDIR}/${SYSTEM_FOLDER}/${REGION}"
+        COPY_BIOS_TO_GAMESDIR "${BIOS_SOURCE}" "${GAMES_TARGET}" "${SYSTEM_FOLDER}"
+    fi
 }
 
 GETTER_NEOGEO()
@@ -300,13 +321,14 @@ GETTER_NEOGEO()
     local SYSTEM="${1}"
     GET_SYSTEM_FOLDER "${SYSTEM}"
     local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
+    local GAMESDIR="${GET_SYSTEM_FOLDER_GAMESDIR}"
 
     if [[ "${SYSTEM_FOLDER}" != "" ]]
         then
             rm /tmp/neogeo.bios.file 2> /dev/null
             for NEO_BIOS_REGEX in ${NEOGEO_BIOS[@]}
             do
-                find "$GET_SYSTEM_FOLDER_GAMESDIR/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "$GET_SYSTEM_FOLDER_GAMESDIR/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
+                find "$GAMESDIR/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "$GAMESDIR/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
                 while read NEO_BIOS_PATH
                 do
                     echo "  $NEO_BIOS_PATH" >> /tmp/neogeo.bios.file
@@ -326,22 +348,19 @@ GETTER_NEOGEO()
                     local BOOT_ROM='000-lo.lo'
                     local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip'
                     local BIOS_ROM='000-lo.lo'
-                    INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
+                    INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "${BOOT_ROM}" "${ZIP_URL}" "${BIOS_ROM}"
 
                     if [ ! -f "$BIOSDIR/NeoGeo/sfix.sfix" ] || [ ! -f "$BIOSDIR/NeoGeo/uni-bios.rom" ]
                         then
-                            curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "$BIOSDIR/uni-bios-40.zip" http://unibios.free.fr/download/uni-bios-40.zip 
-                            echo " "
-                            unzip -o -j "$BIOSDIR/uni-bios-40.zip" -d "$BIOSDIR/NeoGeo/"
-                            rm "$BIOSDIR/uni-bios-40.zip"
+                            DOWNLOAD_ZIP "http://unibios.free.fr/download/uni-bios-40.zip" "$BIOSDIR/uni-bios-40.zip" "$BIOSDIR/NeoGeo"
                     fi
 
-                    COPY_BIOS_TO_GAMESDIR "$BIOSDIR/NeoGeo/sfix.sfix" "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
-                    COPY_BIOS_TO_GAMESDIR "$BIOSDIR/NeoGeo/uni-bios.rom" "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
+                    COPY_BIOS_TO_GAMESDIR "$BIOSDIR/NeoGeo/sfix.sfix" "$GAMESDIR/$SYSTEM_FOLDER/sfix.sfix" "$SYSTEM_FOLDER"
+                    COPY_BIOS_TO_GAMESDIR "$BIOSDIR/NeoGeo/uni-bios.rom" "$GAMESDIR/$SYSTEM_FOLDER/uni-bios.rom" "$SYSTEM_FOLDER"
             fi
             echo
         else
-                    echo "Please create a "$GET_SYSTEM_FOLDER_GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
+                    echo "Please create a "$GAMESDIR/$SYSTEM" directory" >> /tmp/dir.errors
     fi
                     echo ""
                     echo "##################################################################"
@@ -358,10 +377,7 @@ FETCH_FILE_NORMAL()
 
     if [ ! -f "${BIOS_SOURCE_FILE}" ] ; then
         mkdir -vp "$(dirname ${BIOS_SOURCE_FILE})"
-        echo ""
-
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${BIOS_SOURCE_FILE}" "${SOURCE_FILE_URL}"
-        echo ""
+        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} -s --fail --location -o "${BIOS_SOURCE_FILE}" "${SOURCE_FILE_URL}"
     fi
     FETCH_FILE_RESULT_BIOS_SOURCE_FILE="${BIOS_SOURCE_FILE}"
 }
@@ -371,24 +387,26 @@ FETCH_FILE_ZIP()
     local SOURCE_FILE_URL="${2}"
     local SOURCE_UNZIPPED_ROM_NAME="${3}"
 
-    local SOURCE_FILE_BASENAME="$(basename ${SOURCE_FILE_URL})"
+    local SOURCE_FILE_BASENAME=$(basename "${SOURCE_FILE_URL}")
     local BIOS_SOURCE_FILE="${BIOSDIR}/${SOURCE_FILE_BASENAME%.*}/${SOURCE_UNZIPPED_ROM_NAME}"
     local CURL_OUTPUT_PATH="${BIOSDIR}/${SOURCE_FILE_BASENAME}"
-    local BIOS_SOURCE_DIR="$(dirname ${BIOS_SOURCE_FILE})"
+    local BIOS_SOURCE_DIR=$(dirname "${BIOS_SOURCE_FILE}")
 
     if [ ! -f "${BIOS_SOURCE_FILE}" ] ; then
         mkdir -vp "${BIOS_SOURCE_DIR}"
-        echo ""
-
-        curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} --fail --location -o "${CURL_OUTPUT_PATH}" "${SOURCE_FILE_URL}"
-        echo ""
-
-        unzip -o -j "${CURL_OUTPUT_PATH}" -d "${BIOS_SOURCE_DIR}/"
-        echo ""
-
-        rm "${CURL_OUTPUT_PATH}" 2> /dev/null
+        DOWNLOAD_ZIP "${SOURCE_FILE_URL}" "${CURL_OUTPUT_PATH}" "${BIOS_SOURCE_DIR}"
     fi
     FETCH_FILE_RESULT_BIOS_SOURCE_FILE="${BIOS_SOURCE_FILE}"
+}
+
+DOWNLOAD_ZIP()
+{
+    local SOURCE_FILE_URL="${1}"
+    local CURL_OUTPUT_PATH="${2}"
+    local BIOS_SOURCE_DIR="${3}"
+    curl ${CURL_RETRY} ${SSL_SECURITY_OPTION} -s --fail --location -o "${CURL_OUTPUT_PATH}" "${SOURCE_FILE_URL}"
+    unzip -o -j "${CURL_OUTPUT_PATH}" -d "${BIOS_SOURCE_DIR}/"
+    rm "${CURL_OUTPUT_PATH}" 2> /dev/null
 }
 
 
@@ -410,45 +428,7 @@ GET_SYSTEM_FOLDER()
     done
 }
 
-INSTALL_SINGLE_ROM () 
-{ 
-    local SYSTEM_FOLDER="${1}"
-    local TARGET_ROM_NAME="${2}"
-    local SOURCE_FILE_URL="${3}"
-    local SOURCE_UNZIPPED_ROM_NAME="${4}"
-
-    local GAMESDIR_TARGET_FILE="${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${TARGET_ROM_NAME}"
-    if [ -e "${GAMESDIR_TARGET_FILE}" ]
-        then
-            echo "${NOTHING_TO_BE_DONE_MSG}"
-            echo "Skipped '${GAMESDIR_TARGET_FILE}' because already exists." >> /tmp/bios.info 
-        else
-            if [[ ${SOURCE_FILE_URL^^} =~ \.ZIP$ ]] ; then
-                FETCH_FILE_ZIP "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}" "${SOURCE_UNZIPPED_ROM_NAME}"
-            else
-                FETCH_FILE_NORMAL "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}"
-            fi
-
-            COPY_BIOS_TO_GAMESDIR "${FETCH_FILE_RESULT_BIOS_SOURCE_FILE}" "${GAMESDIR_TARGET_FILE}" "${SYSTEM_FOLDER}"
-    fi
-}
-
-INSTALL_MEGACD_REGION ()
-{
-    local SYSTEM_FOLDER="${1}"
-    local BIOS_SOURCE="${2}"
-    local REGION="${3}"
-
-    local GAMES_TARGET="${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${REGION}/cd_bios.rom"
-    if [ -f "${GAMES_TARGET}" ] ; then
-        echo "Skipped '$GAMES_TARGET' because already exists." >> /tmp/bios.info
-    elif [ -f "${BIOS_SOURCE}" ] ; then
-        mkdir -p "${GET_SYSTEM_FOLDER_GAMESDIR}/${SYSTEM_FOLDER}/${REGION}"
-        COPY_BIOS_TO_GAMESDIR "${BIOS_SOURCE}" "${GAMES_TARGET}" "${SYSTEM_FOLDER}"
-    fi
-}
-
-COPY_BIOS_TO_GAMESDIR ()
+COPY_BIOS_TO_GAMESDIR()
 {
     local BIOS_SOURCE="${1}"
     local GAMES_TARGET="${2}"
