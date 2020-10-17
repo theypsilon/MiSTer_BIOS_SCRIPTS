@@ -27,7 +27,7 @@ This script DOES NOT download any cores.
 
 **Q:** Can I set this to work with usb drives?
 
-#A: yes, this script will automatically recognize all the directories the same way the MiSTer binary would do
+**A:** Yes, this script will automatically recognize all the directories the same way the MiSTer binary would do
 
 The bios-getter will download many bios files to /media/fat/BIOS. However, we have chosen some sane defaults to be copied to the /games/<console> directory. These defaults are:
   
