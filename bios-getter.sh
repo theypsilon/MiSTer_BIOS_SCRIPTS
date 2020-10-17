@@ -78,7 +78,7 @@ SYSTEMS_WITH_BIOS=( \
     TurboGrafx16 \
 )
 
-FIND_FOLDERS=( \
+GAMESDIR_FOLDERS=( \
     /media/fat \
     /media/usb0 \
     /media/usb1 \
@@ -189,7 +189,7 @@ GET_SYSTEM_FOLDER()
     GET_SYSTEM_FOLDER_GAMESDIR="/media/fat/games"
     GET_SYSTEM_FOLDER_RESULT=
     local SYSTEM="${1}"
-    for folder in ${FIND_FOLDERS[@]}
+    for folder in ${GAMESDIR_FOLDERS[@]}
     do
         local RESULT=$(find "${folder}" -maxdepth 1 -type d -iname "${SYSTEM}" -printf "%P\n" -quit 2> /dev/null)
         if [[ "${RESULT}" != "" ]] ; then
