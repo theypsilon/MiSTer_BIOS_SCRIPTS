@@ -76,6 +76,7 @@ SYSTEMS_WITH_BIOS=( \
     MegaCD \
     NeoGeo \
     NES \
+    SNES \
     TurboGrafx16 \
 )
 
@@ -172,6 +173,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot0.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
                 'fds-bios.rom'
+                ;;
+
+            snes)
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'bsx_bios.rom' \
+                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/SNES.zip' \
+                'BS-X BIOS (English) [No DRM] [2016 v1.3].sfc'
                 ;;
 
             turbografx16)
