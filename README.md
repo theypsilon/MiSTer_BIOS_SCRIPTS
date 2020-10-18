@@ -31,6 +31,12 @@ This script DOES NOT download any cores.
 
 The bios-getter will download many bios files to /media/fat/BIOS. However, we have chosen some sane defaults to be copied to the /games/<console> directory. These defaults are:
   
+  Ao486
+  ```
+  https://github.com/MiSTer-devel/ao486_MiSTer/blob/master/releases/bios/boot0.rom
+  https://github.com/MiSTer-devel/ao486_MiSTer/blob/master/releases/bios/boot1.rom
+  ```
+  
   Astrocade
   ```
   Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin
@@ -63,6 +69,11 @@ The bios-getter will download many bios files to /media/fat/BIOS. However, we ha
  NES
  ```
  fds-bios.rom
+ ```
+ 
+ SNES
+ ```
+ BS-X BIOS (English) [No DRM] [2016 v1.3].sfc
  ```
  
  TGFX16-CD
