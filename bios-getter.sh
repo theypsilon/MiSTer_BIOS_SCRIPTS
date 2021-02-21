@@ -69,15 +69,15 @@ fi
 
 
 SYSTEMS_WITH_BIOS=( \
-    Ao486 \
+    AO486 \
     Astrocade \
-    Gameboy \
+    GAMEBOY \
     GBA \
     MegaCD \
     NeoGeo \
     NES \
     SNES \
-    TurboGrafx16 \
+    TGFX16 \
 )
 
 GAMESDIR_FOLDERS=( \
@@ -181,7 +181,7 @@ ITERATE_SYSTEMS()
                 'BS-X BIOS (English) [No DRM] [2016 v1.3].sfc'
                 ;;
 
-            turbografx16)
+            tgfx16)
                 local GAMESDIR_CD_FOLDER_NAME="TGFX16-CD"
                 GET_SYSTEM_FOLDER "${GAMESDIR_CD_FOLDER_NAME}"
                 if [[ "${GET_SYSTEM_FOLDER_RESULT}" == "" ]] ; then
@@ -212,6 +212,14 @@ GETTER_DO()
     GET_SYSTEM_FOLDER "${SYSTEM}"
     local SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
     local GAMESDIR="${GET_SYSTEM_FOLDER_GAMESDIR}"
+
+    if [[ "${SYSTEM_FOLDER}" == "" ]]
+        then
+            mkdir -p "${GAMESDIR}/${SYSTEM}"
+            GET_SYSTEM_FOLDER "${SYSTEM}"
+            SYSTEM_FOLDER="${GET_SYSTEM_FOLDER_RESULT}"
+            GAMESDIR="${GET_SYSTEM_FOLDER_GAMESDIR}"
+    fi
 
     if [[ "${SYSTEM_FOLDER}" != "" ]]
         then
