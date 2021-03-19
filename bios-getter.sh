@@ -71,6 +71,7 @@ fi
 SYSTEMS_WITH_BIOS=( \
     AO486 \
     Astrocade \
+    AtariLynx \
     GAMEBOY \
     GBA \
     MegaCD \
@@ -147,6 +148,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Astrocade.zip' \
                 "Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin"
+                ;;
+
+            atarilynx)
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
+                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/AtariLynx.zip' \
+                'boot.rom'
                 ;;
 
             gameboy)

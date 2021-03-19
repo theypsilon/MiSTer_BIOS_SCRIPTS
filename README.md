@@ -41,7 +41,12 @@ The bios-getter will download many bios files to /media/fat/BIOS. However, we ha
   ```
   Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin
   ```
-  
+
+  AtariLynx
+  ```
+  boot.rom
+  ```
+
   Gameboy
   ```
   GB_boot_ROM.gb
