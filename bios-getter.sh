@@ -147,25 +147,25 @@ ITERATE_SYSTEMS()
 
             astrocade)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Astrocade.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/Astrocade.zip' \
                 "Bally Professional Arcade, Astrocade '3159' BIOS (1978)(Bally Mfg. Corp.).bin"
                 ;;
 
             atarilynx)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/AtariLynx.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/AtariLynx.zip' \
                 'boot.rom'
                 ;;
 
             gameboy)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot1.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/Gameboy.zip' \
                 'GBC_boot_ROM.gb'
                 ;;
 
             gba)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/GBA.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/GBA.zip' \
                 'gba_bios.bin'
                 ;;
 
@@ -179,13 +179,13 @@ ITERATE_SYSTEMS()
 
             nes)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot0.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
                 'fds-bios.rom'
                 ;;
 
             snes)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'bsx_bios.rom' \
-                'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/SNES.zip' \
+                'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/SNES.zip' \
                 'BS-X BIOS (English) [No DRM] [2016 v1.3].sfc'
                 ;;
 
@@ -200,7 +200,7 @@ ITERATE_SYSTEMS()
                 fi
                 if [ -d "${GET_SYSTEM_FOLDER_GAMESDIR}/${GAMESDIR_CD_FOLDER_NAME}" ] ; then
                     GETTER_DO INSTALL_SINGLE_ROM "${GAMESDIR_CD_FOLDER_NAME}" 'cd_bios.rom' \
-                    'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
+                    'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/TurboGrafx16.zip' \
                     'Super CD 3.1.pce'
                 fi
                 ;;
@@ -300,7 +300,7 @@ INSTALL_MEGACD()
     local GAMESDIR="${2}"
 
     local BOOT_ROM='boot.rom'
-    local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
+    local ZIP_URL='https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/MegaCD.zip'
     local BIOS_ROM='US Sega CD 2 (Region Free) 930601 l_oliveira.bin'
     local MEGACD_BIOSES=(
         "${GAMESDIR}/${SYSTEM_FOLDER}/${BOOT_ROM}"
@@ -372,7 +372,7 @@ INSTALL_NEOGEO()
                     echo
             fi
 
-            INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" '000-lo.lo' 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip' '000-lo.lo'
+            INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" '000-lo.lo' 'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip' '000-lo.lo'
 
             COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/sfix.sfix" "${GAMESDIR}/${SYSTEM_FOLDER}/sfix.sfix" "${SYSTEM_FOLDER}"
             COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/uni-bios.rom" "${GAMESDIR}/${SYSTEM_FOLDER}/uni-bios.rom" "${SYSTEM_FOLDER}"
@@ -385,13 +385,13 @@ INSTALL_WONDERSWAN()
     local SYSTEM_FOLDER="${1}"
     local GAMESDIR="${2}"
 
-    local INSTALL_1=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot.rom" 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot.rom")
+    local INSTALL_1=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot.rom" 'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot.rom")
     if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
         echo "${INSTALL_1}"
     fi
 
     echo
-    local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot1.rom")
+    local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" 'https://archive.org/download/mi-ster-console-bios-pack_202106/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot1.rom")
     if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
         echo "${INSTALL_2}"
     fi
