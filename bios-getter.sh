@@ -79,7 +79,7 @@ SYSTEMS_WITH_BIOS=( \
     NES \
     SNES \
     TGFX16 \
-    WonderSwan \
+#    WonderSwan \
 )
 
 GAMESDIR_FOLDERS=( \
