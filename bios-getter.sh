@@ -79,6 +79,7 @@ SYSTEMS_WITH_BIOS=( \
     NES \
     SNES \
     TGFX16 \
+    WonderSwan \
 )
 
 GAMESDIR_FOLDERS=( \
@@ -203,6 +204,11 @@ ITERATE_SYSTEMS()
                     'Super CD 3.1.pce'
                 fi
                 ;;
+
+            wonderswan)
+                GETTER_DO INSTALL_WONDERSWAN "${SYSTEM}"
+                ;;
+
         esac
 
     done 
@@ -372,6 +378,27 @@ INSTALL_NEOGEO()
             COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/uni-bios.rom" "${GAMESDIR}/${SYSTEM_FOLDER}/uni-bios.rom" "${SYSTEM_FOLDER}"
     fi
     echo
+}
+
+INSTALL_WONDERSWAN()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+
+    local INSTALL_1=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot.rom" 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot.rom")
+    if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        echo "${INSTALL_1}"
+    fi
+
+    echo
+    local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" 'https://archive.org/download/mi-ster-console-bios-pack/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot1.rom")
+    if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        echo "${INSTALL_2}"
+    fi
+
+    if [[ "${INSTALL_1}" == "${NOTHING_TO_BE_DONE_MSG}" ]] && [[ "${INSTALL_2}" == "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
+    fi
 }
 
 FETCH_FILE_RESULT_BIOS_SOURCE_FILE=
