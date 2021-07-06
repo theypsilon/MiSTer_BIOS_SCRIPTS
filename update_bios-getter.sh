@@ -101,7 +101,7 @@ case ${RET_CURL} in
 esac
 
 BIOS_GETTER="bios-getter.sh"
-URL="https://github.com/MAME-GETTER/MiSTer_BIOS_SCRIPTS/raw/master/"
+URL="https://github.com/theypsilon/MiSTer_BIOS_SCRIPTS/raw/master/"
 echo "Downloading the most recent ${BIOS_GETTER} script."
 echo ""
 
