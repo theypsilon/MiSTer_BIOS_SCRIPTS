@@ -74,6 +74,7 @@ SYSTEMS_WITH_BIOS=( \
     AtariLynx \
     GAMEBOY \
     GBA \
+    Intellivision \
     MegaCD \
     NeoGeo \
     NES \
@@ -126,6 +127,17 @@ NEOGEO_BIOS=( \
 
 NOTHING_TO_BE_DONE_MSG="Nothing to be done."
 
+declare -A INTELLIVISION_BIOS=( \
+    ["boot0.rom"]="Executive ROM, The (1978)(Mattel).bin" \
+    ["boot1.rom"]="GROM, The (1978)(General Instruments).bin" \
+    ["boot2.rom"]="IntelliVoice BIOS (1981)(Mattel).bin" \
+    ["boot3.rom"]="Entertainment Computer System's EXEC-BASIC ROM, The (1978)(Mattel).bin" \
+)
+
+declare -A WONDERSWAN_BIOS=( \
+    ["boot.rom"]="boot.rom" \
+    ["boot1.rom"]="boot1.rom" \
+)
 
 ITERATE_SYSTEMS()
 {
@@ -169,6 +181,10 @@ ITERATE_SYSTEMS()
                 'gba_bios.bin'
                 ;;
 
+            intellivision)
+                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Intellivision.zip' INTELLIVISION_BIOS
+                ;;
+
             megacd)
                 GETTER_DO INSTALL_MEGACD "${SYSTEM}"
                 ;;
@@ -206,7 +222,7 @@ ITERATE_SYSTEMS()
                 ;;
 
             wonderswan)
-                GETTER_DO INSTALL_WONDERSWAN "${SYSTEM}"
+                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' WONDERSWAN_BIOS
                 ;;
 
         esac
@@ -270,6 +286,36 @@ INSTALL_SINGLE_ROM()
             fi
             echo
             COPY_BIOS_TO_GAMESDIR "${FETCH_FILE_RESULT_BIOS_SOURCE_FILE}" "${GAMESDIR_TARGET_FILE}" "${SYSTEM_FOLDER}"
+    fi
+}
+
+INSTALL_MULTI_ROM_FROM_SINGLE_ZIP()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+    local SOURCE_FILE_URL="${3}"
+    declare -n ARRAY="${4}"
+
+    if [[ "${SYSTEM_FOLDER}" == "Intellivision" ]] ; then
+        mkdir -p "${GAMESDIR}/${SYSTEM_FOLDER}"
+    fi
+
+    local NOTHING_DONE_COUNTER=0
+
+    for rom in ${!ARRAY[@]}
+    do
+        local FILE="${ARRAY[${rom}]}"
+
+        local INSTALL=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "${rom}" "${SOURCE_FILE_URL}" "${FILE}")
+        if [[ "${INSTALL}" != "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
+            echo "${INSTALL}"
+        else
+            NOTHING_DONE_COUNTER=$((NOTHING_DONE_COUNTER + 1))
+        fi
+    done
+
+    if [[ "${NOTHING_DONE_COUNTER}" == "${#ARRAY[@]}" ]] ; then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
     fi
 }
 
@@ -378,27 +424,6 @@ INSTALL_NEOGEO()
             COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/uni-bios.rom" "${GAMESDIR}/${SYSTEM_FOLDER}/uni-bios.rom" "${SYSTEM_FOLDER}"
     fi
     echo
-}
-
-INSTALL_WONDERSWAN()
-{
-    local SYSTEM_FOLDER="${1}"
-    local GAMESDIR="${2}"
-
-    local INSTALL_1=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot.rom" 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot.rom")
-    if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
-        echo "${INSTALL_1}"
-    fi
-
-    echo
-    local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' "boot1.rom")
-    if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
-        echo "${INSTALL_2}"
-    fi
-
-    if [[ "${INSTALL_1}" == "${NOTHING_TO_BE_DONE_MSG}" ]] && [[ "${INSTALL_2}" == "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
-        echo "${NOTHING_TO_BE_DONE_MSG}"
-    fi
 }
 
 FETCH_FILE_RESULT_BIOS_SOURCE_FILE=
