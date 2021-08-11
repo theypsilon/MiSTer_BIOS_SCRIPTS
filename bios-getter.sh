@@ -182,7 +182,9 @@ ITERATE_SYSTEMS()
                 ;;
 
             intellivision)
-                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Intellivision.zip' INTELLIVISION_BIOS
+                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Intellivision.zip' \
+                INTELLIVISION_BIOS
                 ;;
 
             megacd)
@@ -222,7 +224,9 @@ ITERATE_SYSTEMS()
                 ;;
 
             wonderswan)
-                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' WONDERSWAN_BIOS
+                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/WonderSwan.zip' \
+                WONDERSWAN_BIOS
                 ;;
 
         esac
