@@ -75,6 +75,7 @@ SYSTEMS_WITH_BIOS=( \
     GAMEBOY \
     GBA \
     Intellivision \
+    Interact \
     MegaCD \
     NeoGeo \
     NES \
@@ -185,6 +186,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
                 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Intellivision.zip' \
                 INTELLIVISION_BIOS
+                ;;
+
+            interact)
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Interact.zip' \
+                'Interact_ROM.bin'
                 ;;
 
             megacd)

@@ -1,5 +1,5 @@
 # MiSTer_BIOS_Scripts 
-Simple scripts to automate downloading BIOS files for MiSTer console cores.
+Simple scripts to automate downloading BIOS files for MiSTer console & computer cores.
 
 ## Instructions
 
@@ -63,6 +63,11 @@ The bios-getter will download many bios files to /media/fat/BIOS. However, we ha
   GROM, The (1978)(General Instruments).bin
   IntelliVoice BIOS (1981)(Mattel).bin
   Entertainment Computer System's EXEC-BASIC ROM, The (1978)(Mattel).bin
+  ```
+
+  Interact
+  ```
+  Interact_ROM.bin
   ```
 
   MegaCD    
