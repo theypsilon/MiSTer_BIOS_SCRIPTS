@@ -103,30 +103,14 @@ GAMESDIR_FOLDERS=( \
     /media/fat/games \
 )
 
-NEOGEO_BIOS=( \
-    "000-lo\.lo" \
-    "japan-j3\.bin" \
-    "sfix\.sfix" \
-    "sm1\.sm1" \
-    "sp1-j3\.bin" \
-    "sp1\.jipan\.1024" \
-    "sp1-u2" \
-    "sp1-u3\.bin" \
-    "sp1-u4\.bin" \
-    "sp-1v1_3db8c" \
-    "sp-45\.sp1" \
-    "sp-e\.sp1" \
-    "sp-j2\.sp1" \
-    "sp-j3\.sp1" \
-    "sp-s2\.sp1" \
-    "sp-s3\.sp1" \
-    "sp-s\.sp1" \
-    "sp-u2\.sp1" \
-    "uni-bios.*\.rom" \
-    "vs-bios\.rom" \
-)
-
 NOTHING_TO_BE_DONE_MSG="Nothing to be done."
+
+declare -A NEOGEO_BIOS=( \
+    ["000-lo.lo"]="000-lo.lo" \
+    ["sfix.sfix"]="sfix.sfix" \
+    ["neo-epo.sp1"]="neo-epo.sp1-AES_BIOS" \
+    ["sp-s2.sp1"]="sp-s2.sp1-MVS_BIOS" \
+)
 
 declare -A INTELLIVISION_BIOS=( \
     ["boot0.rom"]="Executive ROM, The (1978)(Mattel).bin" \
@@ -285,18 +269,17 @@ INSTALL_SINGLE_ROM()
 
     local GAMESDIR_TARGET_FILE="${GAMESDIR}/${SYSTEM_FOLDER}/${TARGET_ROM_NAME}"
 
-    if [ -e "${GAMESDIR_TARGET_FILE}" ]
-        then
-            echo "${NOTHING_TO_BE_DONE_MSG}"
-            echo "Skipped '${GAMESDIR_TARGET_FILE}' because already exists." >> /tmp/bios.info
+    if [ -e "${GAMESDIR_TARGET_FILE}" ] ; then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
+        echo "Skipped '${GAMESDIR_TARGET_FILE}' because already exists." >> /tmp/bios.info
+    else
+        if [[ "${SOURCE_FILE_URL^^}" =~ \.ZIP$ ]] ; then
+            FETCH_FILE_ZIP "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}" "${SOURCE_UNZIPPED_ROM_NAME}"
         else
-            if [[ "${SOURCE_FILE_URL^^}" =~ \.ZIP$ ]] ; then
-                FETCH_FILE_ZIP "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}" "${SOURCE_UNZIPPED_ROM_NAME}"
-            else
-                FETCH_FILE_NORMAL "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}"
-            fi
-            echo
-            COPY_BIOS_TO_GAMESDIR "${FETCH_FILE_RESULT_BIOS_SOURCE_FILE}" "${GAMESDIR_TARGET_FILE}" "${SYSTEM_FOLDER}"
+            FETCH_FILE_NORMAL "${SYSTEM_FOLDER}" "${SOURCE_FILE_URL}"
+        fi
+        echo
+        COPY_BIOS_TO_GAMESDIR "${FETCH_FILE_RESULT_BIOS_SOURCE_FILE}" "${GAMESDIR_TARGET_FILE}" "${SYSTEM_FOLDER}"
     fi
 }
 
@@ -313,8 +296,7 @@ INSTALL_MULTI_ROM_FROM_SINGLE_ZIP()
 
     local NOTHING_DONE_COUNTER=0
 
-    for rom in ${!ARRAY[@]}
-    do
+    for rom in ${!ARRAY[@]} ; do
         local FILE="${ARRAY[${rom}]}"
 
         local INSTALL=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "${rom}" "${SOURCE_FILE_URL}" "${FILE}")
@@ -340,14 +322,65 @@ INSTALL_AO486()
         echo "${INSTALL_1}"
     fi
 
-    echo
     local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot1.rom" "")
     if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+            echo
+        fi
         echo "${INSTALL_2}"
     fi
 
     if [[ "${INSTALL_1}" == "${NOTHING_TO_BE_DONE_MSG}" ]] && [[ "${INSTALL_2}" == "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
         echo "${NOTHING_TO_BE_DONE_MSG}"
+    fi
+}
+
+INSTALL_NEOGEO()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+
+    local INSTALL_1=$(INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" "${GAMESDIR}" \
+    'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip' \
+    NEOGEO_BIOS)
+    if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        echo "${INSTALL_1}"
+    fi
+
+    local INSTALL_2=$(INSTALL_NEOGEO_UNIBIOS "${SYSTEM_FOLDER}" "${GAMESDIR}")
+    if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+        if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
+            echo
+        fi
+        echo "${INSTALL_2}"
+    fi
+
+    if [[ "${INSTALL_1}" == "${NOTHING_TO_BE_DONE_MSG}" ]] && [[ "${INSTALL_2}" == "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
+    fi
+}
+
+INSTALL_NEOGEO_UNIBIOS()
+{
+    local SYSTEM_FOLDER="${1}"
+    local GAMESDIR="${2}"
+
+    local GAMESDIR_TARGET_FILE="${GAMESDIR}/${SYSTEM_FOLDER}/uni-bios.rom"
+
+    if [ -e "${GAMESDIR_TARGET_FILE}" ] ; then
+        echo "${NOTHING_TO_BE_DONE_MSG}"
+        echo "Skipped '${GAMESDIR_TARGET_FILE}' because already exists." >> /tmp/bios.info
+    else
+        local BIOS_SOURCE_FILE="${BIOSDIR}/NeoGeo/uni-bios.rom"
+        local CURL_OUTPUT_PATH="${BIOSDIR}/uni-bios-40.zip"
+        local BIOS_SOURCE_DIR="${BIOSDIR}/NeoGeo"
+
+        if [ ! -f "${BIOS_SOURCE_FILE}" ] ; then
+            mkdir -p "${BIOS_SOURCE_DIR}"
+            DOWNLOAD_ZIP "http://unibios.free.fr/download/uni-bios-40.zip" "${CURL_OUTPUT_PATH}" "${BIOS_SOURCE_DIR}"
+        fi
+        echo
+        COPY_BIOS_TO_GAMESDIR "${BIOS_SOURCE_FILE}" "${GAMESDIR_TARGET_FILE}" "${SYSTEM_FOLDER}"
     fi
 }
 
@@ -402,41 +435,6 @@ COPY_MEGACD_REGION()
     fi
 }
 
-INSTALL_NEOGEO()
-{
-    local SYSTEM_FOLDER="${1}"
-    local GAMESDIR="${2}"
-
-    rm /tmp/neogeo.bios.file 2> /dev/null
-    for NEO_BIOS_REGEX in ${NEOGEO_BIOS[@]}
-    do
-        find "${GAMESDIR}/${SYSTEM_FOLDER}/" -maxdepth 1 -type f -regextype grep -regex "${GAMESDIR}/${SYSTEM_FOLDER}/${NEO_BIOS_REGEX}" | \
-        while read NEO_BIOS_PATH
-        do
-            echo "  ${NEO_BIOS_PATH}" >> /tmp/neogeo.bios.file
-        done
-    done
-
-    if [ -e /tmp/neogeo.bios.file ]
-        then
-            echo "${NOTHING_TO_BE_DONE_MSG}"
-            echo "Skipped 'NeoGeo' because following files already exists:" >> /tmp/bios.info
-            cat /tmp/neogeo.bios.file >> /tmp/bios.info
-        else
-            if [ ! -f "${BIOSDIR}/NeoGeo/uni-bios.rom" ]
-                then
-                    DOWNLOAD_ZIP "http://unibios.free.fr/download/uni-bios-40.zip" "${BIOSDIR}/uni-bios-40.zip" "${BIOSDIR}/NeoGeo"
-                    echo
-            fi
-
-            INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" '000-lo.lo' 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip' '000-lo.lo'
-
-            COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/sfix.sfix" "${GAMESDIR}/${SYSTEM_FOLDER}/sfix.sfix" "${SYSTEM_FOLDER}"
-            COPY_BIOS_TO_GAMESDIR "${BIOSDIR}/NeoGeo/uni-bios.rom" "${GAMESDIR}/${SYSTEM_FOLDER}/uni-bios.rom" "${SYSTEM_FOLDER}"
-    fi
-    echo
-}
-
 FETCH_FILE_RESULT_BIOS_SOURCE_FILE=
 FETCH_FILE_NORMAL()
 {
@@ -447,11 +445,12 @@ FETCH_FILE_NORMAL()
     local BIOS_SOURCE_FILE="${BIOSDIR}/${SYSTEM_FOLDER}/${SOURCE_FILE_BASENAME}"
 
     if [ ! -f "${BIOS_SOURCE_FILE}" ] ; then
-        mkdir -vp "$(dirname ${BIOS_SOURCE_FILE})"
+        mkdir -p "$(dirname ${BIOS_SOURCE_FILE})"
         DOWNLOAD_FILE "${SOURCE_FILE_URL}" "${BIOS_SOURCE_FILE}"
     fi
     FETCH_FILE_RESULT_BIOS_SOURCE_FILE="${BIOS_SOURCE_FILE}"
 }
+
 FETCH_FILE_ZIP()
 {
     local SYSTEM_FOLDER="${1}"
@@ -464,7 +463,7 @@ FETCH_FILE_ZIP()
     local BIOS_SOURCE_DIR=$(dirname "${BIOS_SOURCE_FILE}")
 
     if [ ! -f "${BIOS_SOURCE_FILE}" ] ; then
-        mkdir -vp "${BIOS_SOURCE_DIR}"
+        mkdir -p "${BIOS_SOURCE_DIR}"
         DOWNLOAD_ZIP "${SOURCE_FILE_URL}" "${CURL_OUTPUT_PATH}" "${BIOS_SOURCE_DIR}"
     fi
     FETCH_FILE_RESULT_BIOS_SOURCE_FILE="${BIOS_SOURCE_FILE}"
@@ -539,6 +538,7 @@ fi
 
 if [ -e /tmp/bios.errors ]
     then
+        echo
         echo "Following errors ocurred."
         cat /tmp/bios.errors
         rm /tmp/bios.errors
@@ -547,6 +547,7 @@ fi
 
 if [ -e /tmp/dir.errors ]
     then
+        echo
         echo "The following directories are need for this script. Please create and organize your roms/files in the following directoies."
         cat /tmp/dir.errors
         rm /tmp/dir.errors
