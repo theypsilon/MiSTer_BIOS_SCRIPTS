@@ -72,6 +72,7 @@ SYSTEMS_WITH_BIOS=( \
     AO486 \
     Astrocade \
     AtariLynx \
+    CoCo3 \
     GAMEBOY \
     GBA \
     Intellivision \
@@ -119,6 +120,12 @@ declare -A INTELLIVISION_BIOS=( \
     ["boot3.rom"]="Entertainment Computer System's EXEC-BASIC ROM, The (1978)(Mattel).bin" \
 )
 
+declare -A COCO3_BIOS=( \
+    ["boot0.rom"]="boot0.rom" \
+    ["boot1.rom"]="boot1.rom" \
+    ["boot2.rom"]="boot2.rom" \
+)
+
 declare -A WONDERSWAN_BIOS=( \
     ["boot.rom"]="boot.rom" \
     ["boot1.rom"]="boot1.rom" \
@@ -152,6 +159,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/AtariLynx.zip' \
                 'boot.rom'
+                ;;
+
+            coco3)
+                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/CoCo3.zip' \
+                COCO3_BIOS
                 ;;
 
             gameboy)
