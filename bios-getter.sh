@@ -163,7 +163,7 @@ ITERATE_SYSTEMS()
 
             coco3)
                 GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
-                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/CoCo3.zip' \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/CoCo3.zip' \
                 COCO3_BIOS
                 ;;
 
