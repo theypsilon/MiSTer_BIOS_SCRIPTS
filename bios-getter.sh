@@ -80,6 +80,7 @@ SYSTEMS_WITH_BIOS=( \
     MegaCD \
     NeoGeo \
     NES \
+    PC8801 \
     SNES \
     TGFX16 \
     WonderSwan \
@@ -203,6 +204,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot0.rom' \
                 'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/NES.zip' \
                 'fds-bios.rom'
+                ;;
+            
+            pc8801)
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/PC88.zip' \
+                'PC8801 MKII SR BIOS.rom'
                 ;;
 
             snes)
