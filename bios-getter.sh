@@ -360,7 +360,7 @@ INSTALL_NEOGEO()
     local SYSTEM_FOLDER="${1}"
     local GAMESDIR="${2}"
 
-    local INSTALL_1=$(INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" "${GAMESDIR}" \
+    local INSTALL_1=$(INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM_FOLDER}" "${GAMESDIR}" \
     'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/NeoGeo.zip' \
     NEOGEO_BIOS)
     if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
