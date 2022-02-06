@@ -69,7 +69,6 @@ fi
 
 
 SYSTEMS_WITH_BIOS=( \
-    AO486 \
     Astrocade \
     AtariLynx \
     CoCo3 \
@@ -146,9 +145,6 @@ ITERATE_SYSTEMS()
         local LOWERCASE_SYSTEM=$(echo "${SYSTEM}" | awk '{print tolower($0)}')
         
         case "${LOWERCASE_SYSTEM}" in
-            ao486)
-                GETTER_DO INSTALL_AO486 "${SYSTEM}"
-                ;;
 
             astrocade)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
@@ -328,29 +324,6 @@ INSTALL_MULTI_ROM_FROM_SINGLE_ZIP()
     done
 
     if [[ "${NOTHING_DONE_COUNTER}" == "${#ARRAY[@]}" ]] ; then
-        echo "${NOTHING_TO_BE_DONE_MSG}"
-    fi
-}
-
-INSTALL_AO486()
-{
-    local SYSTEM_FOLDER="${1}"
-    local GAMESDIR="${2}"
-
-    local INSTALL_1=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot0.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot0.rom" "")
-    if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
-        echo "${INSTALL_1}"
-    fi
-
-    local INSTALL_2=$(INSTALL_SINGLE_ROM "${SYSTEM_FOLDER}" "${GAMESDIR}" "boot1.rom" "https://raw.githubusercontent.com/MiSTer-devel/ao486_MiSTer/master/releases/bios/boot1.rom" "")
-    if [[ "${INSTALL_2}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
-        if [[ "${INSTALL_1}" != "${NOTHING_TO_BE_DONE_MSG}" ]]; then
-            echo
-        fi
-        echo "${INSTALL_2}"
-    fi
-
-    if [[ "${INSTALL_1}" == "${NOTHING_TO_BE_DONE_MSG}" ]] && [[ "${INSTALL_2}" == "${NOTHING_TO_BE_DONE_MSG}" ]] ; then
         echo "${NOTHING_TO_BE_DONE_MSG}"
     fi
 }
