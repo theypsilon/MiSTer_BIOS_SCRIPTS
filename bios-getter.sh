@@ -80,6 +80,7 @@ SYSTEMS_WITH_BIOS=( \
     NeoGeo \
     NES \
     PC8801 \
+#    PSX \
     SNES \
     TGFX16 \
     WonderSwan \
@@ -87,30 +88,22 @@ SYSTEMS_WITH_BIOS=( \
 
 GAMESDIR_FOLDERS=( \
     /media/fat \
-    /media/usb0 \
-    /media/usb1 \
-    /media/usb2 \
-    /media/usb3 \
-    /media/usb4 \
-    /media/usb5 \
     /media/usb0/games \
     /media/usb1/games \
     /media/usb2/games \
     /media/usb3/games \
     /media/usb4/games \
     /media/usb5/games \
-    /media/fat/cifs \
     /media/fat/cifs/games \
     /media/fat/games \
 )
 
 NOTHING_TO_BE_DONE_MSG="Nothing to be done."
 
-declare -A NEOGEO_BIOS=( \
-    ["000-lo.lo"]="000-lo.lo" \
-    ["sfix.sfix"]="sfix.sfix" \
-    ["neo-epo.sp1"]="neo-epo.sp1-AES_BIOS" \
-    ["sp-s2.sp1"]="sp-s2.sp1-MVS_BIOS" \
+declare -A COCO3_BIOS=( \
+    ["boot0.rom"]="boot0.rom" \
+    ["boot1.rom"]="boot1.rom" \
+    ["boot2.rom"]="boot2.rom" \
 )
 
 declare -A INTELLIVISION_BIOS=( \
@@ -120,10 +113,18 @@ declare -A INTELLIVISION_BIOS=( \
     ["boot3.rom"]="Entertainment Computer System's EXEC-BASIC ROM, The (1978)(Mattel).bin" \
 )
 
-declare -A COCO3_BIOS=( \
-    ["boot0.rom"]="boot0.rom" \
-    ["boot1.rom"]="boot1.rom" \
-    ["boot2.rom"]="boot2.rom" \
+declare -A NEOGEO_BIOS=( \
+    ["000-lo.lo"]="000-lo.lo" \
+    ["sfix.sfix"]="sfix.sfix" \
+    ["neo-epo.sp1"]="neo-epo.sp1-AES_BIOS" \
+    ["sp-s2.sp1"]="sp-s2.sp1-MVS_BIOS" \
+)
+
+declare -A PSX_BIOS=( \
+    ["boot.rom"]="SCPH7000.BIN" \
+    ["boot1.rom"]="SCPH7001.BIN" \
+    ["boot2.rom"]="SCPH7002.BIN" \
+    ["sbi.zip"]="sbi.zip" \
 )
 
 declare -A WONDERSWAN_BIOS=( \
@@ -206,6 +207,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mister-console-bios-pack_theypsilon/PC88.zip' \
                 'PC8801 MKII SR BIOS.rom'
+                ;;
+
+            psx)
+                GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/PSX.zip' \
+                PSX_BIOS
                 ;;
 
             snes)
