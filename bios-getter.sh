@@ -121,8 +121,8 @@ declare -A NEOGEO_BIOS=( \
 )
 
 declare -A PSX_BIOS=( \
-    ["boot.rom"]="SCPH7000.BIN" \
-    ["boot1.rom"]="SCPH7001.BIN" \
+    ["boot.rom"]="SCPH7001.BIN" \
+    ["boot1.rom"]="SCPH7000.BIN" \
     ["boot2.rom"]="SCPH7002.BIN" \
     ["sbi.zip"]="sbi.zip" \
 )
