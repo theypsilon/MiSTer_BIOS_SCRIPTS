@@ -80,7 +80,7 @@ SYSTEMS_WITH_BIOS=( \
     NeoGeo \
     NES \
     PC8801 \
-#    PSX \
+    PSX \
     SNES \
     TGFX16 \
     WonderSwan \
