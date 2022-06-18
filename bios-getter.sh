@@ -168,7 +168,7 @@ ITERATE_SYSTEMS()
 
             gamate)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
-                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Gamate.zip' \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/Gamate.zip' \
                 'gamate_bios.rom'
                 ;;
 
