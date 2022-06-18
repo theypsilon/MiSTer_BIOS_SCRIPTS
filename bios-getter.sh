@@ -72,6 +72,7 @@ SYSTEMS_WITH_BIOS=( \
     Astrocade \
     AtariLynx \
     CoCo3 \
+    Gamate \
     GAMEBOY \
     GBA \
     Intellivision \
@@ -163,6 +164,12 @@ ITERATE_SYSTEMS()
                 GETTER_DO INSTALL_MULTI_ROM_FROM_SINGLE_ZIP "${SYSTEM}" \
                 'https://archive.org/download/mister-console-bios-pack_theypsilon/CoCo3.zip' \
                 COCO3_BIOS
+                ;;
+
+            gamate)
+                GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
+                'https://archive.org/download/mister-console-bios-pack_theypsilon/MiSTer_Console_BIOS_PACK.zip/Gamate.zip' \
+                'gamate_bios.rom'
                 ;;
 
             gameboy)
