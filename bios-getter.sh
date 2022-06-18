@@ -169,7 +169,7 @@ ITERATE_SYSTEMS()
             gamate)
                 GETTER_DO INSTALL_SINGLE_ROM "${SYSTEM}" 'boot.rom' \
                 'https://archive.org/download/mister-console-bios-pack_theypsilon/Gamate.zip' \
-                'gamate_bios.rom'
+                'gamate_boot.rom'
                 ;;
 
             gameboy)
